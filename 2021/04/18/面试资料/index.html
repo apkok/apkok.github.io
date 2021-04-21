@@ -185,7 +185,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      5.8k 字
+      7.2k 字
     </span>
   
 
@@ -195,7 +195,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      68
+      84
        分钟
     </span>
   
@@ -299,7 +299,7 @@
 <p>基本信息</p>
 <p>男 | 本科 | 6年工作经验 | 长沙</p>
 <p>TEL：19973310316</p>
-<p>Email：<a href="mailto:&#x63;&#x68;&#x7a;&#x68;&#x67;&#111;&#111;&#64;&#49;&#54;&#x33;&#46;&#99;&#111;&#x6d;">&#x63;&#x68;&#x7a;&#x68;&#x67;&#111;&#111;&#64;&#49;&#54;&#x33;&#46;&#99;&#111;&#x6d;</a></p>
+<p>Email：<a href="mailto:&#99;&#104;&#x7a;&#x68;&#103;&#111;&#x6f;&#x40;&#x31;&#x36;&#51;&#46;&#x63;&#111;&#x6d;">&#99;&#104;&#x7a;&#x68;&#103;&#111;&#x6f;&#x40;&#x31;&#x36;&#51;&#46;&#x63;&#111;&#x6d;</a></p>
 <p>期望岗位：Android工程师</p>
 <p>期望工作城市：长沙</p>
 <p>项目经历</p>
@@ -580,6 +580,79 @@
 <p>除了捕获View可以通过上面说的id来查找，那么Fragment如何找到新的呢？</p>
 <p>捕获Fragment引用也可以类似通过字段mWho来替换，这个字段可以标识为唯一，但这个字段不是公开的，我们可以通过反射来获取到，然后去更新Fragment。</p>
 </blockquote>
+</li>
+<li><p>如何停止一个线程？</p>
+<p>面试官视角：这道题想考察什么？</p>
+<ul>
+<li>是否对线程的用法有了解</li>
+<li>是否对线程的stop方法有了解</li>
+<li>是否对线程stop过程中存在的问题有认识</li>
+<li>是否熟悉interrupt中断的用法</li>
+<li>是否能解释清楚使用boolean标志位的好处</li>
+<li>是否知道interrupt底层的细节</li>
+<li>通过该题目能够转移话题到线程安全，并阐述无误</li>
+</ul>
+<p>题目剖析：</p>
+<p>1、<code>void stop()</code>、<code>void stop(Throwable obj)</code>，这两个线程停止的方法已经在Java1.1版本被废弃了，连同着暂停和继续的方法也被废弃了。</p>
+<blockquote>
+<p>为什么被废弃呢？因为直接停止线程是不安全的。</p>
+<p>场景：</p>
+<p>Thread1运行，对内存加锁写入中，此时Thread2也想访问这块内存，但它已经拿不到内存锁了，因为Thread1在访问，那么Thread2就会处于阻塞状态，等待内存锁释放，而此时Thread1被暂停了，但它仍持有内存锁，因此Thread2仍然处于阻塞状态，那暂停之后会不会恢复呢，不知道，如果不会恢复的话，那Thread2就得一直等着，这样就会导致一些运行上的问题，万一Thread2还持有了Thread1想要的锁，那就是死锁了。</p>
+<p>此时情况又发生了变化，Thread1被直接停止了，那它会立即释放内存锁，根本没有缓冲的时间，直接停止，直接干掉，假如原本在内存中写入数据，写到一半被停止了，而此时Thread2将会获得内存锁，开始等待CPU的时间片，当获取到时间片访问内存时，发现内存状态异常，这是因为Thread1还没有执行完，就被停止了，留下了烂摊子给Thread2，那Thread2估计也得面临crash，正是因为有这种原因，官方就把线程停止的方法给废弃了，连同着暂停和继续的方法也被废弃了。</p>
+</blockquote>
+<p>2、如何设计可以随时被中断而取消的任务线程？</p>
+<p>线程在设计过程中，主要是任务执行的设计，线程往往与任务是强绑定的，任务执行完了，线程也就结束了。虽然现在线程不能在执行过程中被直接停止，但任务的执行是可以停止的，所以线程的运行模式，其实是个协作的任务执行模式，我们想让线程结束，其目的是想要任务结束。</p>
+<p>因此在设计上，我们应该在任务上添加中断方式：</p>
+<ul>
+<li><p>interrupt</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs java">目标线程：<br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">InterruptableThread</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Thread</span> </span>&#123;<br>	<span class="hljs-meta">@Override</span><br>	<span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">run</span><span class="hljs-params">()</span> </span>&#123;<br>		<span class="hljs-keyword">try</span> &#123;<br>			sleep(<span class="hljs-number">5000</span>);<br>		&#125;<span class="hljs-keyword">catch</span>(InterruptedException e) &#123;<br>			System.out.println(<span class="hljs-string">&quot;interrupted!&quot;</span>);<br>		&#125;<br>	&#125;<br>&#125;<br><br>中断通知：<br><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">interruptAThread</span><span class="hljs-params">()</span> </span>&#123;<br>  Thread thread = <span class="hljs-keyword">new</span> InterruptableThread();<br>  thread.start();<br>  <span class="hljs-keyword">try</span> &#123;<br>    Thread.sleep(<span class="hljs-number">2000</span>);<br>  &#125;<span class="hljs-keyword">catch</span>(InterruptedException e) &#123;<br>    e.printStackTrace();<br>  &#125;<br>  thread.interrupt();<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><code class="hljs java">interrupt有的情况也是不支持的！<br><br>目标线程：<br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">UninterruptableThread</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Thread</span> </span>&#123;<br>  <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">run</span><span class="hljs-params">()</span> </span>&#123;<br>    <span class="hljs-keyword">super</span>.run();<br>    <span class="hljs-comment">// 在for循环中，循环很多次的时候，是不支持interrupt的</span><br>    <span class="hljs-keyword">for</span>(<span class="hljs-keyword">int</span> i=<span class="hljs-number">0</span>;i&lt;<span class="hljs-number">100000</span>;i++) &#123;<br>      <span class="hljs-keyword">if</span>(i%<span class="hljs-number">10000</span> == <span class="hljs-number">0</span>) &#123;<br>        System.out.println(i);<br>      &#125;<br>    &#125;<br>  &#125;<br>&#125;<br><br>中断通知：<br><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">cannotInterruptAThread</span><span class="hljs-params">()</span> </span>&#123;<br>  Thread thread = <span class="hljs-keyword">new</span> UninterruptableThread();<br>  thread.start();<br>  thread.interrupt();<br>&#125;<br><br>想要支持interrupt，可以修改一下目标线程：<br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">InterruptableThread1</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Thread</span> </span>&#123;<br>  <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">run</span><span class="hljs-params">()</span> </span>&#123;<br>    <span class="hljs-keyword">super</span>.run();<br>    <span class="hljs-keyword">for</span>(<span class="hljs-keyword">int</span> i=<span class="hljs-number">0</span>;i&lt;<span class="hljs-number">100000</span>;i++) &#123;<br>      <span class="hljs-comment">// 每次循环都调用一下interrupt()，确认有没有中断通知，如果收到中断通知了，这个时候我们也可以中断，也可以不中断，当然按照中断模式来的话，就停止任务，此时线程也就结束了</span><br>      <span class="hljs-comment">// 关于中断状态的读取，有两个方法：</span><br>      <span class="hljs-comment">// 1、interrupted()，是静态方法，获取当前线程的中断状态，并清空</span><br>      <span class="hljs-comment">// 1.1 当前运行的线程</span><br>      <span class="hljs-comment">// 1.2 中断状态调用后清空，重复调用后续返回false【thread.cc代码中：SetInterruptedLocked(false); // 清空当前中断状态】</span><br>      <span class="hljs-comment">//</span><br>      <span class="hljs-comment">// 2、isInterrupted()，是非静态方法，获取该线程的中断状态，不清空</span><br>      <span class="hljs-comment">// 2.1 调用的线程对象对应的线程</span><br>      <span class="hljs-comment">// 2.2 可重复调用，中断清空前一直返回true</span><br>      <span class="hljs-keyword">if</span>(interrupted()) &#123;<br>        <span class="hljs-keyword">break</span>;<br>      &#125;<br>      <span class="hljs-keyword">if</span>(i%<span class="hljs-number">10000</span> == <span class="hljs-number">0</span>) &#123;<br>        System.out.println(i);<br>      &#125;<br>    &#125;<br>  &#125;<br>&#125;<br><br>中断通知：<br><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">handleInterruptionThread</span><span class="hljs-params">()</span> </span>&#123;<br>  Thread thread = <span class="hljs-keyword">new</span> InterruptableThread1();<br>  thread.start();<br>  thread.interrupt();<br>&#125;<br></code></pre></td></tr></table></figure></li>
+<li><p>boolean标志位</p>
+<p>其实interrupt代码逻辑底层也使用了boolean标志位。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs java">目标线程：<br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">InterruptableThread</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Thread</span> </span>&#123;<br>  <span class="hljs-comment">// boolean isStopped = false; // 此时的isStopped没有加锁，会存在线程间可见性问题，就是在中断通知那里改了true，这里还未必看得到，因为Java的内存模型导致的。</span><br>  <span class="hljs-comment">// 为了解决上面的问题，需要加一个volatile，告诉虚拟机，这个字段是易变的，易变的意思就是，哪里改了这个字段的内容，我这里就得看到。</span><br>  <span class="hljs-keyword">volatile</span> <span class="hljs-keyword">boolean</span> isStopped = <span class="hljs-keyword">false</span>;<br>  <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">run</span><span class="hljs-params">()</span> </span>&#123;<br>    <span class="hljs-keyword">super</span>.run();<br>    <span class="hljs-keyword">for</span>(<span class="hljs-keyword">int</span> i=<span class="hljs-number">0</span>;i&lt;<span class="hljs-number">100000</span>;i++) &#123;<br>      <span class="hljs-keyword">if</span>(isStopped) &#123;<br>        <span class="hljs-keyword">return</span>;<br>      &#125;<br>    &#125;<br>  &#125;<br>&#125;<br><br>中断通知：<br><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">booleanFlag</span><span class="hljs-params">()</span> </span>&#123;<br>  InterruptableThread thread = <span class="hljs-keyword">new</span> InterruptableThread();<br>  thread.start();<br>  ...<br>  thread.isStopped = <span class="hljs-keyword">true</span>;<br>  ...<br>&#125;<br></code></pre></td></tr></table></figure></li>
+<li><p>interrupt与boolean标志位对比</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>interrupt</th>
+<th>boolean</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>系统方法(sleep)</td>
+<td>是</td>
+<td>否</td>
+</tr>
+<tr>
+<td>使用JNI</td>
+<td>是</td>
+<td>否</td>
+</tr>
+<tr>
+<td>加锁</td>
+<td>是</td>
+<td>否</td>
+</tr>
+<tr>
+<td>触发方式</td>
+<td>抛异常</td>
+<td>布尔值判断，也可抛异常</td>
+</tr>
+</tbody></table>
+<ul>
+<li>需要支持系统方法时用中断（功能性）</li>
+<li>其他情况用boolean标志位（性能）</li>
+</ul>
+</li>
+</ul>
+<p>题目结论：</p>
+<ul>
+<li>为什么线程不应该被直接stop？因为涉及到资源清理的问题，可能会给其它线程留下烂摊子。</li>
+<li>线程内置中断机制的使用与原理</li>
+<li>通过volatile boolean标志位通知线程停止</li>
+</ul>
 </li>
 </ul>
 
