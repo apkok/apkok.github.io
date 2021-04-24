@@ -185,7 +185,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      12.3k 字
+      13k 字
     </span>
   
 
@@ -195,7 +195,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      144
+      153
        分钟
     </span>
   
@@ -299,7 +299,7 @@
 <p>基本信息</p>
 <p>男 | 本科 | 6年工作经验 | 长沙</p>
 <p>TEL：19973310316</p>
-<p>Email：<a href="mailto:&#x63;&#x68;&#x7a;&#104;&#103;&#111;&#x6f;&#x40;&#x31;&#x36;&#x33;&#x2e;&#99;&#x6f;&#109;">&#x63;&#x68;&#x7a;&#104;&#103;&#111;&#x6f;&#x40;&#x31;&#x36;&#x33;&#x2e;&#99;&#x6f;&#109;</a></p>
+<p>Email：<a href="mailto:&#x63;&#x68;&#x7a;&#104;&#x67;&#x6f;&#111;&#64;&#49;&#54;&#x33;&#46;&#99;&#x6f;&#x6d;">&#x63;&#x68;&#x7a;&#104;&#x67;&#x6f;&#111;&#64;&#49;&#54;&#x33;&#46;&#99;&#x6f;&#x6d;</a></p>
 <p>期望岗位：Android工程师</p>
 <p>期望工作城市：长沙</p>
 <p>项目经历</p>
@@ -954,18 +954,44 @@
   <figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs kotlin"><span class="hljs-comment">// lazy有几种线程安全的模式，比如同步的、默认不是线程安全的等等</span><br><span class="hljs-keyword">val</span> value <span class="hljs-keyword">by</span> lazy(LazyThreadSafetyMode.PUBLICATION) &#123;<br>    ...<br>&#125;<br><br><span class="hljs-comment">// PUBLICATION的实现就用到了ARFU</span><br><span class="hljs-keyword">private</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">SafePublicationLazyImpl</span>&lt;<span class="hljs-type">out T</span>&gt;</span>(initializer:() -&gt; T):Lazy&lt;T&gt;,Serializable &#123;<br>    <span class="hljs-keyword">override</span> <span class="hljs-keyword">val</span> value:T<br>    	<span class="hljs-keyword">get</span>() &#123;<br>            ...<br>            <span class="hljs-keyword">val</span> newValue = initializerValue()<br>            <span class="hljs-keyword">if</span>(valueUpdater.compareAndSet(<span class="hljs-keyword">this</span>, UNINITIALIZED_VALUE, newValue)) &#123;<br>                ...<br>            &#125;<br>            ...<br>        &#125;<br>    <span class="hljs-keyword">companion</span> <span class="hljs-keyword">object</span> &#123;<br>        <span class="hljs-keyword">private</span> <span class="hljs-keyword">val</span> valueUpdater = AtomicReferenceFieldUpdater.newUpdater(...)<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
 <p>  题目结论：</p>
 <ul>
-<li><p>AR和ARFU的功能一致，原理相同，都是基于Unsafe的CAS操作</p>
-</li>
-<li><p>AR通常作为对象的成员使用，占16B（指针压缩）或24B（指针不压缩），取决于多少位的虚拟机以及有没有开启指针压缩</p>
-</li>
-<li><p>ARFU通常作为类的静态成员使用，对实例成员进行修改，这样做的作用就是节省内存</p>
-</li>
-<li><p>AR使用更友好，ARFU更适合类实例比较多的场景（比如写网络框架的时候肯定会用到ARFU）</p>
-</li>
-<li><p>Kotlin协程的实现，因为也是需要对这个结果保证操作原子性的，所以它的实现也用到了ARFU</p>
-</li>
+<li>AR和ARFU的功能一致，原理相同，都是基于Unsafe的CAS操作</li>
+<li>AR通常作为对象的成员使用，占16B（指针压缩）或24B（指针不压缩），取决于多少位的虚拟机以及有没有开启指针压缩</li>
+<li>ARFU通常作为类的静态成员使用，对实例成员进行修改，这样做的作用就是节省内存</li>
+<li>AR使用更友好，ARFU更适合类实例比较多的场景（比如写网络框架的时候肯定会用到ARFU）</li>
+<li>Kotlin协程的实现，因为也是需要对这个结果保证操作原子性的，所以它的实现也用到了ARFU</li>
+</ul>
+<ul>
 <li><p>十、如何在Android中写出优雅的异步代码？</p>
-<p>- </p>
+<p>面试官视角：这道题想考察什么？</p>
+<ul>
+<li>是否熟练编写异步和同步的代码</li>
+<li>是否熟练回调地狱</li>
+<li>是否能够熟练使用RxJava</li>
+<li>是否对kotlin协程有了解</li>
+<li>是否具备编写良好的代码的意识和能力</li>
+</ul>
+<p>题目剖析：</p>
+<p>1、什么是异步？</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">// 异步就是，代码并不是按照你写的这种方式顺序执行的，比如sendRequest执行完成之后，就会跑到代码最后面，那它里面的onSuccess方法什么时候执行呢？在结果返回的时候执行，这就是异步！所以异步并不是有多个线程，同一个线程也可以的，比如setOnClickListener和sendRequest，这些都是异步代码，异步和同步，主要取决于代码是不是按照顺序执行的。</span><br><br>button.setOnClickListener(<span class="hljs-keyword">new</span> View.OnClickListener() &#123;<br>   <span class="hljs-meta">@Override</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">onClick</span><span class="hljs-params">(View v)</span> </span>&#123;<br>        sendRequest(req, <span class="hljs-keyword">new</span> Callback() &#123;<br>           <span class="hljs-meta">@Override</span><br>            <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">onSuccess</span><span class="hljs-params">(Response resp)</span> </span>&#123;<br>                ...<br>            &#125;<br>        &#125;);<br>    &#125;<br>&#125;);<br></code></pre></td></tr></table></figure>
+
+<p>2、异步的目的是什么？</p>
+<ul>
+<li>提高CPU利用率</li>
+<li>提升GUI程序的响应速度</li>
+<li>异步不一定快！</li>
+</ul>
+<blockquote>
+<p>异步的过程中，要看程序是I/O密集型还是CPU密集型的，如果是CPU密集型的话，其实异步也好，高并发也好，往往会降低CPU的利用率，因为切换线程的时候，会有一些开销，所以对于一些GUI程序来说，特别是切线程切到I/O线程的这种异步的话，它其实是为了提高CPU的利用率，因为大多数I/O线程会被I/O阻塞掉。</p>
+</blockquote>
+<p>3、回调地狱</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs java">button.setOnClickListener(<span class="hljs-keyword">new</span> View.OnClickListener() &#123;<br>   <span class="hljs-meta">@Override</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">onClick</span><span class="hljs-params">(View v)</span> </span>&#123;<br>        sendRequest(req, <span class="hljs-keyword">new</span> Callback() &#123;<br>           <span class="hljs-meta">@Override</span><br>            <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">onSuccess</span><span class="hljs-params">(<span class="hljs-keyword">final</span> Response resp)</span> </span>&#123;<br>                handler.post(<span class="hljs-keyword">new</span> Runnable() &#123;<br>                   <span class="hljs-meta">@Override</span><br>                    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">run</span><span class="hljs-params">()</span> </span>&#123;<br>                        updateUI(resp);<br>                    &#125;<br>                &#125;);<br>            &#125;<br>        &#125;);<br>    &#125;<br>&#125;);<br></code></pre></td></tr></table></figure>
+
+<p>4、为了解决上面的回调地狱的问题，RxJava闪亮登场！</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">// RxJava基本用法</span><br>button.setOnClickListener(<span class="hljs-keyword">new</span> View.OnClickListener() &#123;<br>   <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">onClick</span><span class="hljs-params">(View v)</span> </span>&#123;<br>       sendRequest(req)<br>           .subscribeOn(Schedulers.io())<br>           .observeOn(AndroidSchedulers.mainThread())<br>           .subscribe(<span class="hljs-keyword">new</span> Consumer&lt;Response&gt;() &#123;<br>              <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">accept</span><span class="hljs-params">(Response response)</span> <span class="hljs-keyword">throws</span> Exception </span>&#123;<br>                  updateUI(response);<br>              &#125; <br>           &#125;);<br>       &#125;<br>   &#125; <br>&#125;);<br><br><span class="hljs-comment">// 使用Java的Lambda表达式简化上面的代码</span><br>button.setOnClickListener(v -&gt; sendRequest(req)<br>    .subscribeOn(Schedulers.io())<br>    .observeOn(AndroidSchedulers.mainThread())<br>    .subscribe(response -&gt; updateUI(response)));<br><br><span class="hljs-comment">// 以上代码中的response -&gt; updateUI(response)这行代码很危险！</span><br><span class="hljs-comment">// RxJava异常处理</span><br>button.setOnClickListener(v -&gt; sendRequest(req)<br>    .subscribeOn(Schedulers.io())<br>    .observeOn(AndroidSchedulers.mainThread())<br>    <span class="hljs-comment">// 为了解决异常处理，尽量传一个完整的Observer进去，但这样写不美观</span><br>    .subscribe(<span class="hljs-keyword">new</span> Observer&lt;Response&gt;()&#123;<br>        <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">onSubscribe</span><span class="hljs-params">(Disponsable d)</span> </span>&#123;&#125;<br>        <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">onNext</span><span class="hljs-params">(Response response)</span> </span>&#123;updateUI(response);&#125;<br>        <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">onError</span><span class="hljs-params">(Throwable e)</span> </span>&#123;e.printStackTrace();&#125;<br>        <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">onComplete</span><span class="hljs-params">()</span> </span>&#123;&#125;<br>    &#125;));<br><br><span class="hljs-comment">// 为了解决不美观问题，我们可以将上面的代码再次进行优化</span><br>button.setOnClickListener(v -&gt; sendRequest(req)<br>    .subscribeOn(Schedulers.io())<br>    .observeOn(AndroidSchedulers.mainThread())<br>    .onErrorReturnItem(t -&gt; mapThrowableToResponse(t))<br>    .subscribe(response -&gt; updateUI(response)));<br></code></pre></td></tr></table></figure>
+
+
+
+<p>如何定义优雅？</p>
 </li>
 </ul>
 
