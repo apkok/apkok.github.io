@@ -185,7 +185,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      9.1k 字
+      12.3k 字
     </span>
   
 
@@ -195,7 +195,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      106
+      144
        分钟
     </span>
   
@@ -299,7 +299,7 @@
 <p>基本信息</p>
 <p>男 | 本科 | 6年工作经验 | 长沙</p>
 <p>TEL：19973310316</p>
-<p>Email：<a href="mailto:&#x63;&#104;&#122;&#104;&#103;&#111;&#x6f;&#64;&#x31;&#54;&#x33;&#46;&#x63;&#111;&#x6d;">&#x63;&#104;&#122;&#104;&#103;&#111;&#x6f;&#64;&#x31;&#54;&#x33;&#46;&#x63;&#111;&#x6d;</a></p>
+<p>Email：<a href="mailto:&#x63;&#x68;&#x7a;&#104;&#x67;&#x6f;&#x6f;&#x40;&#49;&#54;&#x33;&#x2e;&#x63;&#111;&#109;">&#x63;&#x68;&#x7a;&#104;&#x67;&#x6f;&#x6f;&#x40;&#49;&#54;&#x33;&#x2e;&#x63;&#111;&#109;</a></p>
 <p>期望岗位：Android工程师</p>
 <p>期望工作城市：长沙</p>
 <p>项目经历</p>
@@ -354,7 +354,7 @@
 <li>Java String的length不是字符数，而是char的个数</li>
 </ul>
 </li>
-<li><p>Java String可以有多长？</p>
+<li><p>一、Java String可以有多长？</p>
 <p>面试官视角：这道题想考察什么？</p>
 <ul>
 <li>是否对字符串编解码有深入了解</li>
@@ -384,7 +384,7 @@
 </ul>
 <p><strong>推荐两本书：Java虚拟机规范、Java语言规范</strong></p>
 </li>
-<li><p>Java的匿名内部类有哪些限制？</p>
+<li><p>二、Java的匿名内部类有哪些限制？</p>
 <p>面试官视角：这道题想考察什么？</p>
 <ul>
 <li>考察匿名内部类的概念和用法</li>
@@ -423,7 +423,7 @@
 <li>创建时只有单一方法的接口可以用Lambda转换</li>
 </ul>
 </li>
-<li><p>怎样理解Java的方法分派？</p>
+<li><p>三、怎样理解Java的方法分派？</p>
 <p>面试官视角：这道题想考察什么？</p>
 <ul>
 <li>多态、虚方法表的认识</li>
@@ -463,7 +463,7 @@
 </li>
 </ul>
 <ul>
-<li><p>Java泛型的实现机制是怎样的？</p>
+<li><p>四、Java泛型的实现机制是怎样的？</p>
 <p>面试官视角：这道题想考察什么？</p>
 <ul>
 <li>对Java泛型是否仅停留在集合框架的使用</li>
@@ -531,7 +531,7 @@
 <li>泛型类型签名信息特定场景下反射可获取</li>
 </ul>
 </li>
-<li><p>Activity的onActivityResult使用起来非常麻烦，为什么不设计成回调？</p>
+<li><p>五、Activity的onActivityResult使用起来非常麻烦，为什么不设计成回调？</p>
 <p>面试官视角：这道题想考察什么？</p>
 <ul>
 <li>是否熟悉onActivityResult的用法</li>
@@ -580,7 +580,7 @@
 </li>
 </ul>
 <ul>
-<li><p>如何停止一个线程？</p>
+<li><p>六、如何停止一个线程？</p>
 <p>面试官视角：这道题想考察什么？</p>
 <ul>
 <li>是否对线程的用法有了解</li>
@@ -595,10 +595,6 @@
 <p>1、<code>void stop()</code>、<code>void stop(Throwable obj)</code>，这两个线程停止的方法已经在Jdk1.1版本被废弃了，连同着暂停和继续的方法也被废弃了。</p>
 <blockquote>
 <p>为什么被废弃呢？因为直接停止线程是不安全的。</p>
-</blockquote>
-</li>
-</ul>
-<blockquote>
 <p>场景：</p>
 <p>Thread1运行，对内存加锁写入中，此时Thread2也想访问这块内存，但它已经拿不到内存锁了，因为Thread1在访问，那么Thread2就会处于阻塞状态，等待内存锁释放，而此时Thread1被暂停了，但它仍持有内存锁，因此Thread2仍然处于阻塞状态，那暂停之后会不会恢复呢，不知道，如果不会恢复的话，那Thread2就得一直等着，这样就会导致一些运行上的问题，万一Thread2还持有了Thread1想要的锁，那就是死锁了。</p>
 <p>此时情况又发生了变化，Thread1被直接停止了，那它会立即释放内存锁，根本没有缓冲的时间，直接停止，直接干掉，假如原本在内存中写入数据，写到一半被停止了，而此时Thread2将会获得内存锁，开始等待CPU的时间片，当获取到时间片访问内存时，发现内存状态异常，这是因为Thread1还没有执行完，就被停止了，留下了烂摊子给Thread2，那Thread2估计也得面临crash，正是因为有这种原因，官方就把线程停止的方法给废弃了，连同着暂停和继续的方法也被废弃了。</p>
@@ -645,22 +641,21 @@
 </tr>
 </tbody></table>
 <ul>
-<li>需要支持系统方法时用中断（功能性）</li>
+<li><p>需要支持系统方法时用中断（功能性）</p>
+<ul>
+<li>其他情况用boolean标志位（性能）</li>
 </ul>
 </li>
-<li><p>其他情况用boolean标志位（性能）</p>
+</ul>
 </li>
 </ul>
 <p>  题目结论：</p>
 <ul>
-<li><p>为什么线程不应该被直接stop？因为涉及到资源清理的问题，可能会给其它线程留下烂摊子。</p>
-</li>
-<li><p>线程内置中断机制的使用与原理</p>
-<ul>
-<li>通过volatile boolean标志位通知线程停止</li>
+<li>为什么线程不应该被直接stop？因为涉及到资源清理的问题，可能会给其它线程留下烂摊子。</li>
+<li>线程内置中断机制的使用与原理：通过volatile、boolean标志位通知线程停止</li>
 </ul>
 </li>
-<li><p>如何写出线程安全的程序？</p>
+<li><p>七、如何写出线程安全的程序？</p>
 <p>面试官视角：这道题想考察什么？</p>
 <ul>
 <li>是否对线程安全有初步了解</li>
@@ -675,7 +670,7 @@
 <blockquote>
 <p>场景：</p>
 <p>假如有三个线程在访问CPU和内存，它们分别为：Thread1、Thread2和Thread3，每一个线程都有一个自己的内存副本（工作内存1、工作内存2和工作内存3），内存副本其实就是Java的内存模型，此时这三个线程同时触发 ++ 运算，比如Thread1先去它自己对应的工作内存1中进行 ++ 运算，比如从5++到了6，此时主内存的数值还是5，其它两个线程对应的内存副本的数值也都还是5，那么问题来了，数值还没来得及同步呢，这个时候Thread2也对自己对应的工作内存2进行 ++ 运算，从5++到了6，这个时候可能是时间片的原因或其它原因，Thread1才把它的工作内存1的数据同步到主内存中，此时主内存的数值变成了6，接下来主内存发了一个指令，要把它自己的数值刷新到其它的内存副本中，这个时候Thread1、Thread2和Thread3对应的工作内存3的数值都变成了6，那么问题又来了，Thread2它自己已经完成了一次 ++ 运算，它本身已经从5++到了6了，按理来说Thread1和Thread2都已经进行 ++ 运算了，主内存的数值应该是7，但现在的结果却还是6，这是不是就出现了不一致的情况，再比如Thread3也进行了 ++ 运算，从6++到了7，这结果也不对，应该是8，因为这三个线程都进行了 ++ 运算，应该是从5+3=8，这就是线程安全问题。</p>
-<p>结论：线程安全问题本质上就是可变资源（内存）线程间共享的问题；不可变、不共享是没有线程安全问题的。</p>
+<p><strong>结论：线程安全问题本质上就是可变资源（内存）线程间共享的问题；不可变、不共享是没有线程安全问题的。</strong></p>
 <p>扩展：进程有安全问题吗？</p>
 <p>没有；因为进程之间只共享CPU时间片（抢时间片），进程之间的内存是相互独立的，一旦进程被kill了，其所拥有的内存都会还给物理内存，但线程是存在于进程当中的，同一个进程中的线程是可以共享内存资源的。</p>
 </blockquote>
@@ -686,10 +681,15 @@
 <li><p>可重入函数</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">// 可重入函数</span><br><span class="hljs-comment">// 什么是可重入函数：传入一个参数进来，经过一系列的运算，再返回一个值出去，中间不会涉及到任何的外部内存的访问、修改，这就叫可重入函数，它没有副作用。</span><br><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">int</span> <span class="hljs-title">addTwo</span><span class="hljs-params">(<span class="hljs-keyword">int</span> num)</span> </span>&#123;<br>    <span class="hljs-keyword">return</span> num + <span class="hljs-number">2</span>;<br>&#125;<br></code></pre></td></tr></table></figure></li>
 <li><p>使用ThreadLocal</p>
+<blockquote>
+<p>上面的 ++ 运算的例子可以看出来，虽然在每一个线程当中都会去访问这个值（数值5），但最终访问的是自己的线程当中的内存副本里面的数值5。</p>
+<p>比如下面的例子：</p>
+<p>这个token的使用场景就是，一个服务器提供很多服务，每一个用户请求进来，都会开一个线程为他提供服务，所以每一个用户属于不同的线程，那么每一个线程去访问这个token，都是不一样的，都有一个属于自己的String类型的副本token，这样的话就不会互相干扰，这样的好处就是，因为不共享资源，所以没有线程安全的问题。</p>
+</blockquote>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">final</span> <span class="hljs-keyword">static</span> ThreadLocal&lt;String&gt; token = <span class="hljs-keyword">new</span> ThreadLocal&lt;&gt;();<br><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">threadLocal</span><span class="hljs-params">()</span> </span>&#123;<br>  Runnable runnable = () -&gt; &#123;<br>    token.set(UUID.randomUUID().toString());<br>    ...<br>    System.out.println(<span class="hljs-string">&quot;e.&quot;</span> + Thread.currentThread().getName()+<span class="hljs-string">&quot;:&quot;</span>+token.get());<br>  &#125;;<br>  <br>  startThread(<span class="hljs-number">5</span>, runnable);<br>&#125;<br></code></pre></td></tr></table></figure>
 
 <p>深入：ThreadLocal剖析（ThreadLocal.java）：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">set</span><span class="hljs-params">(T value)</span> </span>&#123;<br>  Thread t = Thread.currentThread();<br>  ThreadLocalMap map = getMap(t);<br>  <span class="hljs-keyword">if</span>(map != <span class="hljs-keyword">null</span>) &#123;<br>    <span class="hljs-comment">// key：this，就是ThreadLocal</span><br>    <span class="hljs-comment">// value：你想要传入的值</span><br>    map.set(<span class="hljs-keyword">this</span>, value);<br>  &#125;<span class="hljs-keyword">else</span> &#123;<br>    createMap(t, value);<br>  &#125;<br>&#125;<br><br><span class="hljs-function">ThreadLocalMap <span class="hljs-title">getMap</span><span class="hljs-params">(Thread t)</span> </span>&#123;<br>  <span class="hljs-keyword">return</span> t.threadLocal;<br>&#125;<br><br><span class="hljs-comment">// 结论：ThreadLocal本质上是一个绑定在了线程上的一个ThreadLocalMap；如果我和你的线程不一样，那么值一定是不一样的。</span><br></code></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">set</span><span class="hljs-params">(T value)</span> </span>&#123;<br>  Thread t = Thread.currentThread();<br>  ThreadLocalMap map = getMap(t);<br>  <span class="hljs-keyword">if</span>(map != <span class="hljs-keyword">null</span>) &#123;<br>    <span class="hljs-comment">// key：this，就是ThreadLocal</span><br>    <span class="hljs-comment">// value：你想要传入的值</span><br>    map.set(<span class="hljs-keyword">this</span>, value);<br>  &#125;<span class="hljs-keyword">else</span> &#123;<br>    createMap(t, value);<br>  &#125;<br>&#125;<br><br><span class="hljs-comment">// ThreadLocalMap存在线程上的</span><br><span class="hljs-function">ThreadLocalMap <span class="hljs-title">getMap</span><span class="hljs-params">(Thread t)</span> </span>&#123;<br>  <span class="hljs-keyword">return</span> t.threadLocal;<br>&#125;<br><br><span class="hljs-comment">// 结论：ThreadLocal本质上是一个绑定在了线程上的一个ThreadLocalMap；如果我和你的线程不一样，那么值一定是不一样的。</span><br></code></pre></td></tr></table></figure>
 
 <p>ThreadLoalMap 与 WeakHashMap：</p>
 <table>
@@ -701,17 +701,17 @@
 </tr>
 </thead>
 <tbody><tr>
-<td>对象引用</td>
+<td>对象持有</td>
 <td>弱引用</td>
 <td>弱引用</td>
 </tr>
 <tr>
-<td>对象GC</td>
+<td>对象GC回收</td>
 <td>不影响</td>
 <td>不影响</td>
 </tr>
 <tr>
-<td>引用清除</td>
+<td>引用清除策略</td>
 <td>1、主动移除<br />2、线程退出时移除</td>
 <td>1、主动移除<br />2、GC 后移除（ReferenceQueue）</td>
 </tr>
@@ -733,9 +733,15 @@
 </tbody></table>
 <p>ThreadLocal的使用建议：</p>
 <ul>
-<li>声明为全局静态final成员</li>
-<li>避免存储大量对象</li>
-<li>用完后及时移除对象</li>
+<li><p>声明为全局静态final成员</p>
+<p>ThreadLocal在一个线程当中有一个实例就够了，没必要每次创建的时候都去弄一个出来，我们知道使用ThreadLocalMap对象set()的时候，它是以ThreadLocal为key的，所以如果不断的去变化ThreadLocal的对象引用的话，那些对象set()进去就永远找不到了；如果不声明为全局静态final成员的话，还有另外一个问题就是，可见性问题。</p>
+</li>
+<li><p>避免存储大量对象</p>
+<p>这是由底层的数据结构决定的</p>
+</li>
+<li><p>用完后及时移除对象</p>
+<p>因为ThreadLocal本身没有监听机制</p>
+</li>
 </ul>
 </li>
 </ul>
@@ -745,36 +751,43 @@
 
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">static</span> FinalFieldExample f;<br><span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">writer</span><span class="hljs-params">()</span> </span>&#123;<br>  f = <span class="hljs-keyword">new</span> FinalFieldExample();<br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">reader</span><span class="hljs-params">()</span> </span>&#123;<br>  <span class="hljs-keyword">if</span>(f != <span class="hljs-keyword">null</span>) &#123;<br>    <span class="hljs-keyword">int</span> i = f.x;<br>    <span class="hljs-keyword">int</span> j = f.y;<br>  &#125;<br>&#125;<br><br><span class="hljs-comment">// writer 和 reader是两个线程</span><br><span class="hljs-comment">// 我们所期望的i 和 j的值是：i=3，j=4</span><br><span class="hljs-comment">// 但实际情况，有可能是i=3，j=0，这个取决于虚拟机的实现或者cpu的架构的特征，从而来决定指令会不会重排序，如果重排序的话，首先会将非final的成员，重排序到构造方法之外，如上面的示例，因为 x 是final的，所以 x 一定会在构造方法之内被赋值，但 y 是非final的，有可能构造方法执行完了，y的赋值操作还没有弄完，但在reader线程中，发现 f 已经不为null了，可以读值了，所以有可能 i=3，j=0的情况存在。</span><br><span class="hljs-comment">// 结论：被final修饰的变量、方法以及类，不仅不能被修改、不能被覆写、不能被继承，而且还禁止重排序。</span><br></code></pre></td></tr></table></figure>
 
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Singleton</span> </span>&#123;<br>  <span class="hljs-keyword">private</span> <span class="hljs-keyword">volatile</span> <span class="hljs-keyword">static</span> Singleton singleton;<br>  <span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-title">Singleton</span><span class="hljs-params">()</span> </span>&#123;&#125;<br>  <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> Singleton <span class="hljs-title">getInstance</span><span class="hljs-params">()</span> </span>&#123;<br>    <span class="hljs-comment">// 判断是否为null</span><br>    <span class="hljs-keyword">if</span>(singleton == <span class="hljs-keyword">null</span>) &#123;<br>      <span class="hljs-comment">// 是null，加锁</span><br>      <span class="hljs-keyword">synchronized</span>(Singleton.class) &#123;<br>        <span class="hljs-comment">// 再判断是否为null</span><br>        <span class="hljs-keyword">if</span>(singleton == <span class="hljs-keyword">null</span>) &#123;<br>          <span class="hljs-comment">// 还为null，开始初始化，先调用构造方法，再赋值给singleton</span><br>          singleton = <span class="hljs-keyword">new</span> Singleton();<br>        &#125;<br>      &#125;<br>    &#125;<br>    <span class="hljs-keyword">return</span> singleton;<br>  &#125;<br>&#125;<br><br><span class="hljs-comment">// jdk1.5之后，volatile语义被增强了，除了保证线程间可见性，还有禁止重排序功能，所以写DCL（单例）的时候，把volatile加上。</span><br><span class="hljs-comment">// 上面的示例如果不加volatile的话，有可能构造方法还没执行完，singleton就被赋值了，那其它线程拿到这个变量的值的话，就会引发问题。</span><br></code></pre></td></tr></table></figure></li>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Singleton</span> </span>&#123;<br>  <span class="hljs-keyword">private</span> <span class="hljs-keyword">volatile</span> <span class="hljs-keyword">static</span> Singleton singleton;<br>  <span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-title">Singleton</span><span class="hljs-params">()</span> </span>&#123;&#125;<br>  <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> Singleton <span class="hljs-title">getInstance</span><span class="hljs-params">()</span> </span>&#123;<br>    <span class="hljs-comment">// 判断是否为null</span><br>    <span class="hljs-keyword">if</span>(singleton == <span class="hljs-keyword">null</span>) &#123;<br>      <span class="hljs-comment">// 是null，加锁</span><br>      <span class="hljs-keyword">synchronized</span>(Singleton.class) &#123;<br>        <span class="hljs-comment">// 再判断是否为null</span><br>        <span class="hljs-keyword">if</span>(singleton == <span class="hljs-keyword">null</span>) &#123;<br>          <span class="hljs-comment">// 还为null，开始初始化，先调用构造方法，再赋值给singleton</span><br>          singleton = <span class="hljs-keyword">new</span> Singleton();<br>        &#125;<br>      &#125;<br>    &#125;<br>    <span class="hljs-keyword">return</span> singleton;<br>  &#125;<br>&#125;<br><br><span class="hljs-comment">// jdk1.5之后，volatile语义被增强了，除了保证线程间可见性，还有禁止重排序功能，所以写DCL（单例）的时候，把volatile加上。</span><br><span class="hljs-comment">// 上面的示例如果不加volatile的话，有可能出现类似于重排序的问题，可能在锁里面就把singleton给赋值了，但是构造方法还没执行完，那其它线程有可能就会拿到一个没有被初始化完的singleton的引用，这样就会引发问题。</span><br></code></pre></td></tr></table></figure></li>
 <li><p>共享可变资源</p>
 <ul>
-<li><p>保证可见性</p>
+<li><p>保证可见性（你改了，我看得到）</p>
 <ul>
-<li>使用final关键字</li>
-<li>使用volatile关键字</li>
-<li>加锁，锁释放时会强制将缓存刷新到主内存（加锁，只是对另外跟你同样争用同一个锁的那些线程才能保证可见性）</li>
+<li><p>使用final关键字</p>
+</li>
+<li><p>使用volatile关键字</p>
+</li>
+<li><p>加锁，锁释放时会强制将缓存刷新到主内存</p>
+<p>加锁只是对另外跟你同样争用同一个锁的那些线程才能保证可见性，而且加锁的话，会在锁释放时强制将缓存刷新到主内存当中，这就是为什么其它线程加锁了才能看到我刷新到主内存的这个值，原因就在于，它只有加锁了，它才会去从主内存当中刷新，不然的话，它有可能就拿着自己的内存副本去读了（上面的 ++ 运算示例就是因为没有加锁、没有保证可见性也没有保证操作原子性）</p>
+</li>
 </ul>
 </li>
-<li><p>保证操作原子性（反例：上面的 ++ 运算）</p>
+<li><p>保证操作原子性（你在改，我就不能改，我在改，你就不能改；反例：上面的 ++ 运算，你改我也改）</p>
+</li>
+<li><p>加锁，保证操作的互斥性</p>
+</li>
+<li><p>使用CAS指令（如Unsafe.compareAndSwapInt）</p>
+<p>  Unsafe不是公开的，需要用反射才能获取到</p>
+</li>
+<li><p>使用原子数值类型（如AtomicInteger）</p>
 <ul>
-<li>加锁，保证操作的互斥性</li>
-<li>使用CAS指令（如Unsafe.compareAndSwapInt）</li>
-<li>使用原子数值类型（如AtomicInteger）</li>
 <li>使用原子属性更新器（AtomicRerenceFieldUpdater）</li>
 </ul>
 </li>
-<li><p>禁止重排序</p>
+<li><p>禁止重排序（加不加final，那执行顺序就是不一样）</p>
 <ul>
 <li>使用final关键字</li>
 <li>使用volatile关键字</li>
-<li>加锁</li>
 </ul>
 </li>
 </ul>
 </li>
 </ul>
 </li>
-<li><p>ConcurrentHashMap如何支持并发访问？</p>
+<li><p>八、ConcurrentHashMap如何支持并发访问？</p>
 <p>面试官视角：这道题想考察什么？</p>
 <ul>
 <li>是否熟练掌握线程安全的概念</li>
@@ -787,17 +800,172 @@
 <p>3、如果你对ConcurrentHashMap的原理不了解</p>
 <ul>
 <li>分析下HashMap为什么不是线程安全的</li>
-<li>编写并发程序时你会怎么做，举例说明最佳</li>
+<li>编写并发程序时你会怎么做，举例说明最佳<ul>
+<li>保证可见性</li>
+<li>保证操作原子性</li>
+<li>禁止重排序</li>
 </ul>
-<blockquote>
-<p>CHM的并发优化历程</p>
+</li>
+</ul>
+<p>4、CHM的并发优化历程</p>
+<p>​    对于CHM的优化实质上是一个持续性的过程，从JDK1.5出现到JDK1.8之后，每个版本都没有停止过对其进行优化，甚至到JDK1.8有个特别大的改动，就是直接摒弃段。</p>
 <ul>
-<li>JDK 5：分段锁，必要时加锁</li>
-<li>JDK 6：优化二次Hash算法</li>
-<li>JDK 7：段懒加载，volatile &amp; cas</li>
-<li>JDK 8：摒弃段，基于HashMap原理的并发实现</li>
-</ul>
+<li><p>JDK 5：分段锁，必要时加锁</p>
+<blockquote>
+<p>分段加锁，著名的segment[]，不同段之间的访问实质上不受影响</p>
 </blockquote>
+</li>
+<li><p>JDK 6：优化二次Hash算法</p>
+<blockquote>
+<p>针对Hash算法进行二次优化，hash算法到底优化了什么呢？首先我们看源码，hash(key)，这个key就是我们put进来的key，然后对它的hash值进行再一次的散列，拿到一个hashCode，这个值就是用于在普通的hashTable[]中找到相对应的位置，但是因为在JDK1.5中已经分段了，所以hash的值还需要用于在segment[]中找到相对应的位置，综合来说，就是先拿hash高位去segment[]中找位置，然后再用hash低位去hashTable[]中找位置，那么这个时候就要尽可能的保证segment和hashTable里面分布一定要均匀，不然的话，如果都堆到一个segment分段里面的话，你就会发现它退化成了一个hashTable，这就不合适了，所以JDK1.5存在什么问题呢？如果这个key是一个整数的话，你就会发现，它的hash值的高位对于3w多以下的整数得到的结果都是一样的，都是最后那一个segment，这样就达不到分段锁优化的目的了，而超过3w多到40w、50w的hash数值，它的高位也仍然在14到15之间，只有随着hash数值增加，高位才会慢慢的均匀分布在各个段里面，而JDK1.6对这个hash算法做了优化。</p>
+<p>JDK1.5：hash值对于比较小的整数（3w多以下），它的Hash高位始终是15，这样的话就没有办法均匀的分布在各个段里面，因此它会退化成一个hashTable。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">int</span> <span class="hljs-title">hash</span><span class="hljs-params">(Object x)</span> </span>&#123;<br>    <span class="hljs-keyword">int</span> h = x.hashCode();<br>    h += ~(h &lt;&lt; <span class="hljs-number">9</span>);<br>    h ^= (h &gt;&gt;&gt; <span class="hljs-number">14</span>);<br>    h += (h &lt;&lt; <span class="hljs-number">4</span>);<br>    h ^= (h &gt;&gt;&gt; <span class="hljs-number">10</span>);<br>    <span class="hljs-keyword">return</span> h;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>JDK1.6：高位低位均匀分布，因为在JDK1.6中，启用了single-word Wang/Jenkins hash</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">int</span> <span class="hljs-title">hash</span><span class="hljs-params">(<span class="hljs-keyword">int</span> h)</span> </span>&#123;<br>	<span class="hljs-comment">// single-word Wang/Jenkins hash</span><br>    h += ~(h &lt;&lt; <span class="hljs-number">15</span>) ^ <span class="hljs-number">0xffffcd7d</span>;<br>    h ^= (h &gt;&gt;&gt; <span class="hljs-number">10</span>);<br>    h += (h &lt;&lt; <span class="hljs-number">3</span>);<br>    h ^= (h &gt;&gt;&gt; <span class="hljs-number">6</span>);<br>    h += (h &lt;&lt; <span class="hljs-number">2</span>) + (h &lt;&lt; <span class="hljs-number">14</span>);<br>    <span class="hljs-keyword">return</span> h ^ (h &gt;&gt;&gt; <span class="hljs-number">16</span>);<br>&#125;<br></code></pre></td></tr></table></figure></blockquote>
+</li>
+<li><p>JDK 7：段懒加载，volatile &amp; cas（compareAndSet）</p>
+<blockquote>
+<p>JDk1.7之前，Segment会直接初始化，也就是当你创建CHM时，16个Segment会统统创建出来，而从JDK1.7开始，段没有一开始就实例化了，而是需要时才会去初始化，并且访问的时候也尽可能的使用volatile &amp; cas来避免加锁，假如此时第一个hash(key)被扔进来之后，它会放到第一个segment里面，其它的segment都不能放，因为只有使用时才会实例化，但实例化过程中会涉及到一个问题，就是segment的可见性的问题，比如ThreadA过来把这个segment实例化，ThreadB也同时过来访问这个segment的时候，有可能因为可见性的问题，访问不到这个刚刚被初始化的segment，也正是因为这一点，在JDk1.7里面，大量使用了对segment[]的volatile的一个访问，这个访问基于Unsafe类，它提供了volatile访问数组的能力，确保segment创建之后具备可见性。</p>
+</blockquote>
+</li>
+<li><p>JDK 8：摒弃段，基于HashMap原理的并发实现</p>
+<blockquote>
+<p>直接摒弃段，通篇都是基于HashMap的一个改造，改造了对于一些不必加锁的地方，尽量使用volatile进行访问，一些实在没有办法需要加锁的地方，比如写入的操作，也尽量选择一个很小的范围去加锁。</p>
+<p>JDK1.7，我们是说使用volatile访问segment[]，在JDK1.8中摒弃段（segment），直接使用volatile访问hashTable。</p>
+</blockquote>
+</li>
+</ul>
+<p>5、CHM如何计数</p>
+<ul>
+<li>JDK5~7基于段元素个数求和，二次不同就加锁</li>
+<li>JDK8引入CounterCell，本质上也是分段计数</li>
+</ul>
+<p>6、CHM是弱一致性的</p>
+<ul>
+<li><p>添加元素后不一定马上能读到</p>
+<blockquote>
+<p>有可能，我添加的时候，你已经读过去了</p>
+</blockquote>
+</li>
+<li><p>清空之后可能仍然会有元素</p>
+<blockquote>
+<p>我是一段一段的清，有可能我刚刚清理了这段，你又添加进来了</p>
+</blockquote>
+</li>
+<li><p>遍历之前的段元素的变化会读到</p>
+<blockquote>
+<p>如果我还没有遍历到段15，我现在正在遍历段14，你在段15里面做了修改，待会我遍历到段15时就会感觉到段15发生了变化</p>
+</blockquote>
+</li>
+<li><p>遍历之后的段元素变化读不到</p>
+<blockquote>
+<p>如果我遍历到了段14，但你对段13做了修改，那么我就感觉不到了</p>
+</blockquote>
+</li>
+<li><p>遍历时元素发生变化不抛异常</p>
+<blockquote>
+<p>因为遍历是经常发生的</p>
+</blockquote>
+</li>
+</ul>
+<p>7、HashTable的问题</p>
+<p>​    HashTable虽然是线程安全的，但是它非常的粗暴和野蛮，因为你想修改它、想读取它都需要拿锁。</p>
+<ul>
+<li>大锁：对HashTable对象加锁</li>
+<li>长锁：直接对方法加锁</li>
+<li>读写锁共用：只有一把锁，从头锁到尾</li>
+</ul>
+<p>8、针对HashTable的问题，CHM的解法</p>
+<ul>
+<li>小锁：分段锁（JDK5~7），桶节点锁（JDK8）</li>
+<li>短锁：先尝试获取，失败再加锁</li>
+<li>分离读写锁：读失败再加锁（JDK5<del>7），volatile读、CAS（compareAndSet）写（JDK7</del>8）</li>
+</ul>
+<p>9、如何进行锁优化？</p>
+<ul>
+<li><p>长锁不如短锁：尽可能只锁必要的部分</p>
+</li>
+<li><p>大锁不如小锁：尽可能对加锁的对象拆分</p>
+<blockquote>
+<p>HashTable就是典型的大锁，它的锁是直接加到类上面的</p>
+</blockquote>
+</li>
+<li><p>公锁不如私锁：尽可能将锁的逻辑放到私有代码中</p>
+<blockquote>
+<p>尽可能将锁的逻辑放到私有代码中，对外暴露的时候，其实不要让它看到锁，因为如果说外面访问的时候，让它加锁的话，可能会给它的使用带来不必要的麻烦，甚至带来一些错误，因为外部使用的时候，也许不知道你内部的一些逻辑，有可能在使用的过程中，锁不正当的使用，导致死锁也是有可能的。</p>
+</blockquote>
+</li>
+<li><p>嵌套锁不如扁平锁：尽可能在代码设计时避免锁嵌套</p>
+<blockquote>
+<p>这样也能避免逻辑上出现问题，或者出现死锁的情况发生</p>
+</blockquote>
+</li>
+<li><p>分离读写锁：尽可能将读锁和写锁分离</p>
+<blockquote>
+<p>因为大多数的的情况，都在读，只有少部分的时间在写，那么这个时候的话，写可能需要加一个比较重的锁，而读的话，有可能volatile就足够了，甚至不加锁也可以。</p>
+</blockquote>
+</li>
+<li><p>粗化高频锁：尽可能合并处理频繁过短的锁</p>
+<blockquote>
+<p>如果你有一段代码，它被拆成了很多小段，每一小段都加了锁，那么我们知道每加一把锁，它都需要一些开销，如果你这个地方加锁和释放锁的频率特别高，那么就要考虑把它们合并到一块，减少一次性加锁的开销。</p>
+</blockquote>
+</li>
+<li><p>消除无用锁：尽可能不加锁，或用volatile替代锁</p>
+</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li><p>九、AtomicReference和AtomicReferenceFieldUpdater有何异同？</p>
+<p>面试官视角：这道题想考察什么？</p>
+<ul>
+<li><p>是否熟练掌握原子操作的概念</p>
+<blockquote>
+<p>线程安全问题涉及到操作原子性的概念</p>
+</blockquote>
+</li>
+</ul>
+</li>
+<li><p>是否熟悉AR和ARFU这两个类的用法和原理</p>
+</li>
+<li><p>是否对Java对象的内存占用有认识</p>
+</li>
+<li><p>是否有较强的敏感度和深入探究的精神</p>
+<p>题目剖析：</p>
+<p>1、AtomicReference的用法</p>
+</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">AtomicReferenceValueHolder</span> </span>&#123;<br>    AtomicReference&lt;String&gt; atomicValue = <span class="hljs-keyword">new</span> AtomicReference&lt;&gt;(<span class="hljs-string">&quot;HelloAtomic&quot;</span>);<br>&#125;<br></code></pre></td></tr></table></figure>
+  <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs java">  AtomicReferenceValueHolder holder = <span class="hljs-keyword">new</span> AtomicReferenceValueHolder();<br>  <span class="hljs-comment">// compareAndSet（cas）：本质上是使用的Unsafe类提供的CAS能力</span><br>  <span class="hljs-comment">// 如果是“Hello”那么就改成“World”</span><br>  holder.atomicValue.compareAndSet(<span class="hljs-string">&quot;Hello&quot;</span>, <span class="hljs-string">&quot;World&quot;</span>);<br>String value = holder.atomicValue.getAndUpdate(<span class="hljs-keyword">new</span> UnaryOperator&lt;String&gt;()&#123;<br>  	<span class="hljs-meta">@Override</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> String <span class="hljs-title">apply</span><span class="hljs-params">(String s)</span> </span>&#123;<br>          <span class="hljs-keyword">return</span> <span class="hljs-string">&quot;HelloWorld&quot;</span>;<br>      &#125;<br>  &#125;);<br></code></pre></td></tr></table></figure>
+<p>  2、AtomicReferenceFieldUpdater的用法</p>
+  <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">SimpleValueHolder</span> </span>&#123;<br>	<span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> AtomicReferenceFieldUpdater&lt;SimpleValueHolder, String&gt; valueUpdater = AtomicReferenceFieldUpdater.newUpdater(SimpleValueHolder.class, String.class, <span class="hljs-string">&quot;value&quot;</span>);<br>    <span class="hljs-keyword">volatile</span> String value = <span class="hljs-string">&quot;HelloAtomic&quot;</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+  <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs java">  SimpleValueHolder holder = <span class="hljs-keyword">new</span> SimpleValueHolder();<br>  SimpleValueHolder.valueUpdater.compareAndSet(holder, <span class="hljs-string">&quot;Hello&quot;</span>, <span class="hljs-string">&quot;World&quot;</span>);<br>String value = SimpleValueHolder.valueUpdater.getAndUpdate(holder, <span class="hljs-keyword">new</span> UnaryOperator&lt;String&gt;()&#123;<br>      <span class="hljs-meta">@Override</span><br>	<span class="hljs-function"><span class="hljs-keyword">public</span> String <span class="hljs-title">apply</span><span class="hljs-params">(String s)</span> </span>&#123;<br>          <span class="hljs-keyword">return</span> <span class="hljs-string">&quot;HelloWorld&quot;</span>;<br>      &#125;<br>  &#125;);<br></code></pre></td></tr></table></figure>
+<p>3、AR和ARFU的对比</p>
+  <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">AtomicReferenceValueHolder</span> </span>&#123;<br>    AtomicReference&lt;String&gt; atomicValue = <span class="hljs-keyword">new</span> AtomicReference&lt;&gt;(<span class="hljs-string">&quot;HelloAtomic&quot;</span>);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+  <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">SimpleValueHolder</span> </span>&#123;<br>	<span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> AtomicReferenceFieldUpdater&lt;SimpleValueHolder, String&gt; valueUpdater = AtomicReferenceFieldUpdater.newUpdater(SimpleValueHolder.class, String.class, <span class="hljs-string">&quot;value&quot;</span>);<br>    <span class="hljs-keyword">volatile</span> String value = <span class="hljs-string">&quot;HelloAtomic&quot;</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+<blockquote>
+<p>发现AR比ARFU写起来的时候代码量要少得多，而且AR不用像ARFU一样需要用到反射，但是很多框架却选择使用ARFU，我们查看源码发现，AR源码里面，本质也有一个<code>private volatile V value;</code> 存在，那么这两者的差异点主要在于AR本身是要指向一个对象的，也就是要比ARFU多创建一个对象，而这个对象的头（Header）占12个字节，它的成员（Fields）占4个字节，也就比ARFU要多出来16个字节，这是对于32位的是这种情况，如果是64位的话，你启用了<code>-XX:+UseComparessedOops</code> 指针压缩的话，那么Header还是占用12个字节，Fields也还是占用4个字节，但如果没有启用指针压缩的话，那么Header是占16个字节，Fields占用8个字节，总共占用24个字节，那么就说明每创建一个AR都会多出来这么多的内存，那么对GC的压力就有很大的影响了。</p>
+</blockquote>
+<p>  4、迁移：使用ARFU的例子(1)</p>
+  <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">BufferedInputSteam</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">FilterInputStream</span> </span>&#123;<br>    <span class="hljs-keyword">protected</span> <span class="hljs-keyword">volatile</span> <span class="hljs-keyword">byte</span>[];<br>    <br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> AtomicReferenceFieldUpdater&lt;BufferedInputStream, <span class="hljs-keyword">byte</span>[]&gt; bufUpdater = AtomicReferenceFieldUpdater.newUpdater(BufferedInputStream.class, <span class="hljs-keyword">byte</span>[].class, <span class="hljs-string">&quot;buf&quot;</span>);<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>  5、迁移：使用ARFU的例子(2)</p>
+  <figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs kotlin"><span class="hljs-comment">// lazy有几种线程安全的模式，比如同步的、默认不是线程安全的等等</span><br><span class="hljs-keyword">val</span> value <span class="hljs-keyword">by</span> lazy(LazyThreadSafetyMode.PUBLICATION) &#123;<br>    ...<br>&#125;<br><br><span class="hljs-comment">// PUBLICATION的实现就用到了ARFU</span><br><span class="hljs-keyword">private</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">SafePublicationLazyImpl</span>&lt;<span class="hljs-type">out T</span>&gt;</span>(initializer:() -&gt; T):Lazy&lt;T&gt;,Serializable &#123;<br>    <span class="hljs-keyword">override</span> <span class="hljs-keyword">val</span> value:T<br>    	<span class="hljs-keyword">get</span>() &#123;<br>            ...<br>            <span class="hljs-keyword">val</span> newValue = initializerValue()<br>            <span class="hljs-keyword">if</span>(valueUpdater.compareAndSet(<span class="hljs-keyword">this</span>, UNINITIALIZED_VALUE, newValue)) &#123;<br>                ...<br>            &#125;<br>            ...<br>        &#125;<br>    <span class="hljs-keyword">companion</span> <span class="hljs-keyword">object</span> &#123;<br>        <span class="hljs-keyword">private</span> <span class="hljs-keyword">val</span> valueUpdater = AtomicReferenceFieldUpdater.newUpdater(...)<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>  题目结论：</p>
+<ul>
+<li><p>AR和ARFU的功能一致，原理相同，都是基于Unsafe的CAS操作</p>
+</li>
+<li><p>AR通常作为对象的成员使用，占16B（指针压缩）或24B（指针不压缩），取决于多少位的虚拟机以及有没有开启指针压缩</p>
+</li>
+<li><p>ARFU通常作为类的静态成员使用，对实例成员进行修改，这样做的作用就是节省内存</p>
+</li>
+<li><p>AR使用更友好，ARFU更适合类实例比较多的场景（比如写网络框架的时候肯定会用到ARFU）</p>
+</li>
+<li><p>Kotlin协程的实现，因为也是需要对这个结果保证操作原子性的，所以它的实现也用到了ARFU</p>
+</li>
+<li><p>十、如何在Android中写出优雅的异步代码？</p>
+<p>- </p>
 </li>
 </ul>
 
