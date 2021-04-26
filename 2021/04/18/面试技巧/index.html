@@ -18,7 +18,7 @@
   <meta name="author" content="Apkok">
   <meta name="keywords" content="">
   
-  <title>面试资料 - 星海渤文</title>
+  <title>面试技巧 - 星海渤文</title>
 
   <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" />
 
@@ -163,7 +163,7 @@
       <div class="full-bg-img">
         <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
           <div class="page-header text-center fade-in-up">
-            <span class="h2" id="subtitle" title="面试资料">
+            <span class="h2" id="subtitle" title="面试技巧">
               
             </span>
 
@@ -225,7 +225,7 @@
         <div class="py-5" id="board">
           <article class="post-content mx-auto">
             <!-- SEO header -->
-            <h1 style="display: none">面试资料</h1>
+            <h1 style="display: none">面试技巧</h1>
             
             <div class="markdown-body">
               <p>一、梳理自身的技能</p>
@@ -299,7 +299,7 @@
 <p>基本信息</p>
 <p>男 | 本科 | 6年工作经验 | 长沙</p>
 <p>TEL：19973310316</p>
-<p>Email：<a href="mailto:&#x63;&#x68;&#x7a;&#104;&#x67;&#x6f;&#111;&#64;&#49;&#54;&#x33;&#46;&#99;&#x6f;&#x6d;">&#x63;&#x68;&#x7a;&#104;&#x67;&#x6f;&#111;&#64;&#49;&#54;&#x33;&#46;&#99;&#x6f;&#x6d;</a></p>
+<p>Email：<a href="mailto:&#x63;&#x68;&#122;&#x68;&#103;&#x6f;&#x6f;&#64;&#x31;&#x36;&#x33;&#46;&#99;&#x6f;&#109;">&#x63;&#x68;&#122;&#x68;&#103;&#x6f;&#x6f;&#64;&#x31;&#x36;&#x33;&#46;&#99;&#x6f;&#109;</a></p>
 <p>期望岗位：Android工程师</p>
 <p>期望工作城市：长沙</p>
 <p>项目经历</p>
@@ -937,21 +937,28 @@
 </li>
 </ul>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">AtomicReferenceValueHolder</span> </span>&#123;<br>    AtomicReference&lt;String&gt; atomicValue = <span class="hljs-keyword">new</span> AtomicReference&lt;&gt;(<span class="hljs-string">&quot;HelloAtomic&quot;</span>);<br>&#125;<br></code></pre></td></tr></table></figure>
+
   <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs java">  AtomicReferenceValueHolder holder = <span class="hljs-keyword">new</span> AtomicReferenceValueHolder();<br>  <span class="hljs-comment">// compareAndSet（cas）：本质上是使用的Unsafe类提供的CAS能力</span><br>  <span class="hljs-comment">// 如果是“Hello”那么就改成“World”</span><br>  holder.atomicValue.compareAndSet(<span class="hljs-string">&quot;Hello&quot;</span>, <span class="hljs-string">&quot;World&quot;</span>);<br>String value = holder.atomicValue.getAndUpdate(<span class="hljs-keyword">new</span> UnaryOperator&lt;String&gt;()&#123;<br>  	<span class="hljs-meta">@Override</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> String <span class="hljs-title">apply</span><span class="hljs-params">(String s)</span> </span>&#123;<br>          <span class="hljs-keyword">return</span> <span class="hljs-string">&quot;HelloWorld&quot;</span>;<br>      &#125;<br>  &#125;);<br></code></pre></td></tr></table></figure>
+
 <p>  2、AtomicReferenceFieldUpdater的用法</p>
   <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">SimpleValueHolder</span> </span>&#123;<br>	<span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> AtomicReferenceFieldUpdater&lt;SimpleValueHolder, String&gt; valueUpdater = AtomicReferenceFieldUpdater.newUpdater(SimpleValueHolder.class, String.class, <span class="hljs-string">&quot;value&quot;</span>);<br>    <span class="hljs-keyword">volatile</span> String value = <span class="hljs-string">&quot;HelloAtomic&quot;</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+
   <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs java">  SimpleValueHolder holder = <span class="hljs-keyword">new</span> SimpleValueHolder();<br>  SimpleValueHolder.valueUpdater.compareAndSet(holder, <span class="hljs-string">&quot;Hello&quot;</span>, <span class="hljs-string">&quot;World&quot;</span>);<br>String value = SimpleValueHolder.valueUpdater.getAndUpdate(holder, <span class="hljs-keyword">new</span> UnaryOperator&lt;String&gt;()&#123;<br>      <span class="hljs-meta">@Override</span><br>	<span class="hljs-function"><span class="hljs-keyword">public</span> String <span class="hljs-title">apply</span><span class="hljs-params">(String s)</span> </span>&#123;<br>          <span class="hljs-keyword">return</span> <span class="hljs-string">&quot;HelloWorld&quot;</span>;<br>      &#125;<br>  &#125;);<br></code></pre></td></tr></table></figure>
+
 <p>3、AR和ARFU的对比</p>
   <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">AtomicReferenceValueHolder</span> </span>&#123;<br>    AtomicReference&lt;String&gt; atomicValue = <span class="hljs-keyword">new</span> AtomicReference&lt;&gt;(<span class="hljs-string">&quot;HelloAtomic&quot;</span>);<br>&#125;<br></code></pre></td></tr></table></figure>
 
   <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">SimpleValueHolder</span> </span>&#123;<br>	<span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> AtomicReferenceFieldUpdater&lt;SimpleValueHolder, String&gt; valueUpdater = AtomicReferenceFieldUpdater.newUpdater(SimpleValueHolder.class, String.class, <span class="hljs-string">&quot;value&quot;</span>);<br>    <span class="hljs-keyword">volatile</span> String value = <span class="hljs-string">&quot;HelloAtomic&quot;</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+
 <blockquote>
 <p>发现AR比ARFU写起来的时候代码量要少得多，而且AR不用像ARFU一样需要用到反射，但是很多框架却选择使用ARFU，我们查看源码发现，AR源码里面，本质也有一个<code>private volatile V value;</code> 存在，那么这两者的差异点主要在于AR本身是要指向一个对象的，也就是要比ARFU多创建一个对象，而这个对象的头（Header）占12个字节，它的成员（Fields）占4个字节，也就比ARFU要多出来16个字节，这是对于32位的是这种情况，如果是64位的话，你启用了<code>-XX:+UseComparessedOops</code> 指针压缩的话，那么Header还是占用12个字节，Fields也还是占用4个字节，但如果没有启用指针压缩的话，那么Header是占16个字节，Fields占用8个字节，总共占用24个字节，那么就说明每创建一个AR都会多出来这么多的内存，那么对GC的压力就有很大的影响了。</p>
 </blockquote>
 <p>  4、迁移：使用ARFU的例子(1)</p>
   <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">BufferedInputSteam</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">FilterInputStream</span> </span>&#123;<br>    <span class="hljs-keyword">protected</span> <span class="hljs-keyword">volatile</span> <span class="hljs-keyword">byte</span>[];<br>    <br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> AtomicReferenceFieldUpdater&lt;BufferedInputStream, <span class="hljs-keyword">byte</span>[]&gt; bufUpdater = AtomicReferenceFieldUpdater.newUpdater(BufferedInputStream.class, <span class="hljs-keyword">byte</span>[].class, <span class="hljs-string">&quot;buf&quot;</span>);<br>&#125;<br></code></pre></td></tr></table></figure>
+
 <p>  5、迁移：使用ARFU的例子(2)</p>
   <figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs kotlin"><span class="hljs-comment">// lazy有几种线程安全的模式，比如同步的、默认不是线程安全的等等</span><br><span class="hljs-keyword">val</span> value <span class="hljs-keyword">by</span> lazy(LazyThreadSafetyMode.PUBLICATION) &#123;<br>    ...<br>&#125;<br><br><span class="hljs-comment">// PUBLICATION的实现就用到了ARFU</span><br><span class="hljs-keyword">private</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">SafePublicationLazyImpl</span>&lt;<span class="hljs-type">out T</span>&gt;</span>(initializer:() -&gt; T):Lazy&lt;T&gt;,Serializable &#123;<br>    <span class="hljs-keyword">override</span> <span class="hljs-keyword">val</span> value:T<br>    	<span class="hljs-keyword">get</span>() &#123;<br>            ...<br>            <span class="hljs-keyword">val</span> newValue = initializerValue()<br>            <span class="hljs-keyword">if</span>(valueUpdater.compareAndSet(<span class="hljs-keyword">this</span>, UNINITIALIZED_VALUE, newValue)) &#123;<br>                ...<br>            &#125;<br>            ...<br>        &#125;<br>    <span class="hljs-keyword">companion</span> <span class="hljs-keyword">object</span> &#123;<br>        <span class="hljs-keyword">private</span> <span class="hljs-keyword">val</span> valueUpdater = AtomicReferenceFieldUpdater.newUpdater(...)<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
 <p>  题目结论：</p>
 <ul>
 <li>AR和ARFU的功能一致，原理相同，都是基于Unsafe的CAS操作</li>
@@ -1020,6 +1027,12 @@
                 <div class="post-prevnext">
                   <article class="post-prev col-6">
                     
+                    
+                      <a href="/2021/04/26/%E9%9D%A2%E8%AF%95%E9%A2%98%E4%B8%80%EF%BC%9AJava%E7%9A%84char%E6%98%AF%E4%B8%A4%E4%B8%AA%E5%AD%97%E8%8A%82%EF%BC%8C%E5%A6%82%E4%BD%95%E5%AD%98UTF-8%E5%AD%97%E7%AC%A6%EF%BC%9F/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">面试题一：Java的char是两个字节，如何存UTF-8字符？</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
                     
                   </article>
                   <article class="post-next col-6">
