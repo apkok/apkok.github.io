@@ -185,7 +185,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      10.4k 字
+      9.1k 字
     </span>
   
 
@@ -195,7 +195,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      122
+      105
        分钟
     </span>
   
@@ -299,7 +299,7 @@
 <p>基本信息</p>
 <p>男 | 本科 | 6年工作经验 | 长沙</p>
 <p>TEL：19973310316</p>
-<p>Email：<a href="mailto:&#x63;&#x68;&#122;&#x68;&#103;&#111;&#x6f;&#x40;&#49;&#54;&#51;&#x2e;&#x63;&#111;&#x6d;">&#x63;&#x68;&#122;&#x68;&#103;&#111;&#x6f;&#x40;&#49;&#54;&#51;&#x2e;&#x63;&#111;&#x6d;</a></p>
+<p>Email：<a href="mailto:&#99;&#104;&#122;&#104;&#x67;&#x6f;&#111;&#x40;&#49;&#x36;&#51;&#46;&#99;&#x6f;&#109;">&#99;&#104;&#122;&#104;&#x67;&#x6f;&#111;&#x40;&#49;&#x36;&#51;&#46;&#99;&#x6f;&#109;</a></p>
 <p>期望岗位：Android工程师</p>
 <p>期望工作城市：长沙</p>
 <p>项目经历</p>
@@ -326,74 +326,6 @@
 <p><strong>推荐两本书：Java虚拟机规范、Java语言规范</strong></p>
 <p>八、面试题</p>
 <ul>
-<li><p>四、Java泛型的实现机制是怎样的？</p>
-<p>面试官视角：这道题想考察什么？</p>
-<ul>
-<li>对Java泛型是否仅停留在集合框架的使用</li>
-<li>对Java泛型的实现机制的认知和理解</li>
-<li>是否有足够的项目开发实战和“踩坑”经验</li>
-<li>对泛型（或模版）编程是否有深入的对比研究</li>
-<li>对常见的框架原理是否有过深入剖析</li>
-</ul>
-<p>题目剖析：</p>
-<p>1、类型擦除从编译角度的细节</p>
-<p>2、类型擦除对运行时的影响</p>
-<p>3、类型擦除对反射的影响</p>
-<p>4、对比类型不擦除的语言（C#）</p>
-<p>5、为什么Java选择类型擦除</p>
-<blockquote>
-<p>类型擦除的优劣：</p>
-<ul>
-<li><p>类型擦除的好处：</p>
-<ul>
-<li>运行时内存负担小（因为编译之后都是一个类型，如List&lt;String&gt;类型，编译之后就是List类型）</li>
-<li>兼容性好（Jdk1.5才推出泛型，因此类型擦除是为了顾及Jdk1.0到1.4的版本）</li>
-</ul>
-</li>
-<li><p>类型擦除的问题：</p>
-<ul>
-<li><p>基本类型无法作为泛型实参（就有了装箱和拆箱的开销问题）</p>
-</li>
-<li><p>泛型类型无法用作方法重载（因为类型擦除了，不管形参是List&lt;String&gt; 还是 List&lt;Integer&gt;类型，编译之后都是List类型）</p>
-</li>
-<li><p>泛型类型无法当做真实类型使用（因为类型擦除了，编译之后，所有T类型都会转换成Object类型，那么直接new 一个 Object类型的话，其实这不是我们想要的类型，而我们想要的是T类型的实际类型，但Java并不能new出来，因为Java根本不知道这个T类型到底是个啥）</p>
-</li>
-<li><p>静态方法无法引用类泛型参数（因为类泛型参数只有在类实例化之后才知道，而静态方法根本不需要有类的实例，但静态方法可以声明泛型参数）</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">GenericClass</span>&lt;<span class="hljs-title">T</span>&gt; </span>&#123;<br>	<span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> &lt;R&gt; <span class="hljs-function">R <span class="hljs-title">max</span><span class="hljs-params">(R a, R b)</span> </span>&#123;...&#125;<br>&#125;<br></code></pre></td></tr></table></figure></li>
-<li><p>类型强转的运行时开销（因为类型擦除，在运行时，字节码会将类型进行强转，这样你才能使用具体类型的方法）</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs java">在Jdk &lt; <span class="hljs-number">1.5</span>：<br><br>List strings = <span class="hljs-keyword">new</span> ArrayList();<br>strings.add(<span class="hljs-string">&quot;Hello&quot;</span>);<br>String value = (String)strings.get(<span class="hljs-number">0</span>); <span class="hljs-comment">// 在代码中需要手动将类型进行强转，同时在字节码中也会将类型进行强转</span><br><br>在Jdk &gt;= <span class="hljs-number">1.5</span>：<br><br>List&lt;String&gt; strings = <span class="hljs-keyword">new</span> ArrayList&lt;&gt;();<br>strings.add(<span class="hljs-string">&quot;Hello&quot;</span>);<br>String value = strings.get(<span class="hljs-number">0</span>); <span class="hljs-comment">// 在代码中我们使用了泛型，所以不需要手动将类型进行强转，但会在运行时的字节码中将类型进行强转，这是因为编译完成之后，类型被擦除了。</span><br></code></pre></td></tr></table></figure></li>
-</ul>
-</li>
-</ul>
-</blockquote>
-<blockquote>
-<p>知识迁移：Gson.fromJson为什么需要传入Class？</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> &lt;T&gt; <span class="hljs-function">T <span class="hljs-title">fromJson</span><span class="hljs-params">(String json, Class&lt;T&gt; classOfT)</span> <span class="hljs-keyword">throws</span> JsonSyntaxException </span>&#123;<br>	Object object = fromJson(json, (Type)classOfT);<br>	<span class="hljs-keyword">return</span> Primitives.wrap(classOfT).cast(object);<br>&#125;<br></code></pre></td></tr></table></figure>
-
-<p>还是那句话，在Java中，泛型在编译之后，都会被擦除，你不传具体的类型，我怎么给你转成你想要的类型。</p>
-</blockquote>
-<blockquote>
-<p>附加的签名信息（Signatures）：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">// SuperCalss有个泛型参数：T</span><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">SupperClass</span>&lt;<span class="hljs-title">T</span>&gt; </span>&#123;&#125;<br><br><span class="hljs-comment">// SubClass继承SuperClass，并将泛型参数确定为String</span><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">SubClass</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">SuperClass</span>&lt;<span class="hljs-title">String</span>&gt; </span>&#123;<br>	<span class="hljs-keyword">public</span> List&lt;Map&lt;String, Integer&gt;&gt; getValue() &#123;<br>		<span class="hljs-keyword">return</span> <span class="hljs-keyword">null</span>;<br>	&#125;<br>&#125;<br></code></pre></td></tr></table></figure>
-
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs java">通过反射获取类泛型信息:<br>ParameterizedType superType = (ParameterizedType)SubClass.class.getGenericSuperClass();<br><span class="hljs-keyword">for</span>(Type actualTypeArgument : superType.getActrualTypeArguments()) &#123;<br>	System.out.println(actualTypeArgument);<br>&#125;<br><br>通过发射获取方法泛型信息:<br>ParameterizedType methodType = (ParameterizedType)SubClass.class.getMethod(<span class="hljs-string">&quot;getValue&quot;</span>).getGenericReturnType();<br><span class="hljs-keyword">for</span>(Type type : methodType.getActrualTypeArguments()) &#123;<br>	System.out.println(type);<br>&#125;<br><br>Tip：混淆时要保留签名信息<br>- keepattributes Signature<br></code></pre></td></tr></table></figure>
-</blockquote>
-<blockquote>
-<p>知识迁移：使用泛型签名的两个实例</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs java">Gson:<br><br><span class="hljs-comment">// TypeToken，本身是用protected声明的类，不能直接new，但是可以用来构造匿名内部类，匿名内部类为什么可以直接被new出来，是因为子类可以访问父类的构造方法</span><br><span class="hljs-comment">// getType，里面调用的就是getGenericReturnType()，从而可以获取实际的泛型类型</span><br>Type collectionType = <span class="hljs-keyword">new</span> TypeToken&lt;Collection&lt;Integer&gt;&gt;()&#123;&#125;.getType();<br>Collection&lt;Integer&gt; ints = gson.fromJson(json, collectionType);<br></code></pre></td></tr></table></figure>
-
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs java">Retrofit:<br><br><span class="hljs-class"><span class="hljs-keyword">interface</span> <span class="hljs-title">GithubServiceApi</span> </span>&#123;<br><span class="hljs-comment">// 通过接口返回的数据都是序列化后的信息，比如json、pb以及xml等，这些信息并没有携带类型的信息，而且我们知道Call&lt;User&gt;编译后，都会擦除类型，也就是说Call&lt;User&gt;会变成Call&lt;Object&gt;，那我们如何将其解析成对应的JavaBean呢？其实还是通过getGenericReturnType()进行发射，从而获取实际的泛型类型。</span><br>	<span class="hljs-meta">@Get(&quot;users/&#123;login&#125;&quot;)</span><br>	<span class="hljs-function">Call&lt;User&gt; <span class="hljs-title">getUserCallback</span><span class="hljs-params">(<span class="hljs-meta">@Path(&quot;login&quot;)</span>String login)</span></span>;<br>&#125;<br></code></pre></td></tr></table></figure>
-
-<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs kotlin">Kotlin反射的实现原理:<br><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">HelloWorld</span></span><br><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">final</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">com</span>/<span class="hljs-title">zane</span>/<span class="hljs-title">demo</span>/<span class="hljs-title">HelloWorld</span> </span>&#123;<br><span class="hljs-comment">//access flags 0x1</span><br><span class="hljs-keyword">public</span> &lt;<span class="hljs-keyword">init</span>&gt;()V<br><br>...<br><br><span class="hljs-meta">@LKotlin</span>/Metadata;(mv=&#123;<span class="hljs-number">1</span>,<span class="hljs-number">1</span>,<span class="hljs-number">13</span>&#125;, bv=&#123;<span class="hljs-number">1</span>,<span class="hljs-number">0</span>,<span class="hljs-number">3</span>&#125;, k=<span class="hljs-number">1</span>, d1=&#123;<span class="hljs-string">&quot;\u0000\u000c\n\u0002 ....&quot;</span>&#125;, d2=&#123;<span class="hljs-string">&quot;Lcom/zane/demo/HelloWorld;&quot;</span>, <span class="hljs-string">&quot;&quot;</span>, <span class="hljs-string">&quot;()V&quot;</span>, <span class="hljs-string">&quot;Chapter1_JavaBasics_main&quot;</span>&#125;)<br><span class="hljs-comment">//compiled from: HelloWorld.kt</span><br>&#125;<br><br>Kotlin是通过Metadata注解来实现反射的。<br><br>Tip：混淆时要保留签名信息(如果没有用到反射，就不需要注意了)<br>- keep <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">kotlin</span>.<span class="hljs-title">Metadata</span> </span>&#123;*;&#125;<br></code></pre></td></tr></table></figure>
-</blockquote>
-<p>题目结论：</p>
-<ul>
-<li>Java泛型采用类型擦除实现（Java的实现机制就是类型擦除）</li>
-<li>类型编译时被擦除为Object，所以不兼容基本类型</li>
-<li>类型擦除的实现方案主要考虑后向兼容</li>
-<li>泛型类型签名信息特定场景下反射可获取</li>
-</ul>
-</li>
 <li><p>五、Activity的onActivityResult使用起来非常麻烦，为什么不设计成回调？</p>
 <p>面试官视角：这道题想考察什么？</p>
 <ul>

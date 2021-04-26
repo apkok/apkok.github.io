@@ -1,0 +1,492 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=&#34;auto&#34;>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon.png">
+  <link rel="icon" href="/img/favicon.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="">
+  <meta name="author" content="Apkok">
+  <meta name="keywords" content="">
+  
+  <title>面试题五：Java泛型的实现机制是怎样的？ - 星海渤文</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10.4.0/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
+  
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"apkok.github.io","root":"/","version":"1.8.9-a","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null}}};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>星海渤文</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;</a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" href="javascript:">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('/img/default.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="面试题五：Java泛型的实现机制是怎样的？">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2021-04-26 11:02" pubdate>
+        2021年4月26日 上午
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      1.4k 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      17
+       分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">面试题五：Java泛型的实现机制是怎样的？</h1>
+            
+            <div class="markdown-body">
+              <h3 id="Java泛型的实现机制是怎样的？"><a href="#Java泛型的实现机制是怎样的？" class="headerlink" title="Java泛型的实现机制是怎样的？"></a>Java泛型的实现机制是怎样的？</h3><h4 id="一、面试官视角：这道题想考察什么？"><a href="#一、面试官视角：这道题想考察什么？" class="headerlink" title="一、面试官视角：这道题想考察什么？"></a>一、面试官视角：这道题想考察什么？</h4><ul>
+<li>对Java泛型是否仅停留在集合框架的使用</li>
+<li>对Java泛型的实现机制的认知和理解</li>
+<li>是否有足够的项目开发实战和“踩坑”经验</li>
+<li>对泛型（或模版）编程是否有深入的对比研究</li>
+<li>对常见的框架原理是否有过深入剖析</li>
+</ul>
+<h4 id="二、题目剖析："><a href="#二、题目剖析：" class="headerlink" title="二、题目剖析："></a>二、题目剖析：</h4><p>1、类型擦除从编译角度的细节</p>
+<p>2、类型擦除对运行时的影响</p>
+<p>3、类型擦除对反射的影响</p>
+<p>4、对比类型不擦除的语言（C#）</p>
+<p>5、为什么Java选择类型擦除</p>
+<ul>
+<li><p>类型擦除的好处：</p>
+<blockquote>
+<p>1、运行时内存负担小（因为编译之后都是一个类型，如List&lt;String&gt;类型，编译之后就是List类型）</p>
+<p>2、兼容性好（Jdk1.5才推出泛型，因此类型擦除是为了顾及Jdk1.0到1.4的版本）</p>
+</blockquote>
+</li>
+<li><p>类型擦除的问题：</p>
+<blockquote>
+<p>1、基本类型无法作为泛型实参（就有了装箱和拆箱的开销问题）</p>
+<p>2、泛型类型无法用作方法重载（因为类型擦除了，不管形参是List&lt;String&gt; 还是 List&lt;Integer&gt;类型，编译之后都是List类型）</p>
+<p>3、泛型类型无法当做真实类型使用（因为类型擦除了，编译之后，所有T类型都会转换成Object类型，那么直接new 一个 Object类型的话，其实这不是我们想要的类型，而我们想要的是T类型的实际类型，但Java并不能new出来，因为Java根本不知道这个T类型到底是个啥）</p>
+<p>4、静态方法无法引用类泛型参数（因为类泛型参数只有在类实例化之后才知道，而静态方法根本不需要有类的实例，但静态方法可以声明泛型参数）</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">GenericClass</span>&lt;<span class="hljs-title">T</span>&gt; </span>&#123;<br>	<span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> &lt;R&gt; <span class="hljs-function">R <span class="hljs-title">max</span><span class="hljs-params">(R a, R b)</span> </span>&#123;...&#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>5、类型强转的运行时开销（因为类型擦除，在运行时，字节码会将类型进行强转，这样你才能使用具体类型的方法）</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs java">在Jdk &lt; <span class="hljs-number">1.5</span>：<br><br>List strings = <span class="hljs-keyword">new</span> ArrayList();<br>strings.add(<span class="hljs-string">&quot;Hello&quot;</span>);<br>String value = (String)strings.get(<span class="hljs-number">0</span>); <span class="hljs-comment">// 在代码中需要手动将类型进行强转，同时在字节码中也会将类型进行强转</span><br><br>在Jdk &gt;= <span class="hljs-number">1.5</span>：<br><br>List&lt;String&gt; strings = <span class="hljs-keyword">new</span> ArrayList&lt;&gt;();<br>strings.add(<span class="hljs-string">&quot;Hello&quot;</span>);<br>String value = strings.get(<span class="hljs-number">0</span>); <span class="hljs-comment">// 在代码中我们使用了泛型，所以不需要手动将类型进行强转，但会在运行时的字节码中将类型进行强转，这是因为编译完成之后，类型被擦除了。</span><br></code></pre></td></tr></table></figure></blockquote>
+</li>
+</ul>
+<p>6、知识迁移：Gson.fromJson为什么需要传入Class？</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> &lt;T&gt; <span class="hljs-function">T <span class="hljs-title">fromJson</span><span class="hljs-params">(String json, Class&lt;T&gt; classOfT)</span> <span class="hljs-keyword">throws</span> JsonSyntaxException </span>&#123;<br>	Object object = fromJson(json, (Type)classOfT);<br>	<span class="hljs-keyword">return</span> Primitives.wrap(classOfT).cast(object);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<p>还是那句话，在Java中，泛型在编译之后，都会被擦除，你不传具体的类型，我怎么给你转成你想要的类型。</p>
+</blockquote>
+<p>7、附加的签名信息（Signatures）</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">// SuperCalss有个泛型参数：T</span><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">SupperClass</span>&lt;<span class="hljs-title">T</span>&gt; </span>&#123;&#125;<br><br><span class="hljs-comment">// SubClass继承SuperClass，并将泛型参数确定为String</span><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">SubClass</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">SuperClass</span>&lt;<span class="hljs-title">String</span>&gt; </span>&#123;<br>	<span class="hljs-keyword">public</span> List&lt;Map&lt;String, Integer&gt;&gt; getValue() &#123;<br>		<span class="hljs-keyword">return</span> <span class="hljs-keyword">null</span>;<br>	&#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs java">通过反射获取类泛型信息:<br>ParameterizedType superType = (ParameterizedType)SubClass.class.getGenericSuperClass();<br><span class="hljs-keyword">for</span>(Type actualTypeArgument : superType.getActrualTypeArguments()) &#123;<br>	System.out.println(actualTypeArgument);<br>&#125;<br><br>通过发射获取方法泛型信息:<br>ParameterizedType methodType = (ParameterizedType)SubClass.class.getMethod(<span class="hljs-string">&quot;getValue&quot;</span>).getGenericReturnType();<br><span class="hljs-keyword">for</span>(Type type : methodType.getActrualTypeArguments()) &#123;<br>	System.out.println(type);<br>&#125;<br><br>Tip：混淆时要保留签名信息<br>- keepattributes Signature<br></code></pre></td></tr></table></figure>
+
+<p>8、知识迁移：使用泛型签名的两个实例</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs java">Gson:<br><br><span class="hljs-comment">// TypeToken，本身是用protected声明的类，不能直接new，但是可以用来构造匿名内部类，匿名内部类为什么可以直接被new出来，是因为子类可以访问父类的构造方法</span><br><span class="hljs-comment">// getType，里面调用的就是getGenericReturnType()，从而可以获取实际的泛型类型</span><br>Type collectionType = <span class="hljs-keyword">new</span> TypeToken&lt;Collection&lt;Integer&gt;&gt;()&#123;&#125;.getType();<br>Collection&lt;Integer&gt; ints = gson.fromJson(json, collectionType);<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs java">Retrofit:<br><br><span class="hljs-class"><span class="hljs-keyword">interface</span> <span class="hljs-title">GithubServiceApi</span> </span>&#123;<br><span class="hljs-comment">// 通过接口返回的数据都是序列化后的信息，比如json、pb以及xml等，这些信息并没有携带类型的信息，而且我们知道Call&lt;User&gt;编译后，都会擦除类型，也就是说Call&lt;User&gt;会变成Call&lt;Object&gt;，那我们如何将其解析成对应的JavaBean呢？其实还是通过getGenericReturnType()进行发射，从而获取实际的泛型类型。</span><br>	<span class="hljs-meta">@Get(&quot;users/&#123;login&#125;&quot;)</span><br>	<span class="hljs-function">Call&lt;User&gt; <span class="hljs-title">getUserCallback</span><span class="hljs-params">(<span class="hljs-meta">@Path(&quot;login&quot;)</span>String login)</span></span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs kotlin">Kotlin反射的实现原理:<br><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">HelloWorld</span></span><br><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">final</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">com</span>/<span class="hljs-title">zane</span>/<span class="hljs-title">demo</span>/<span class="hljs-title">HelloWorld</span> </span>&#123;<br><span class="hljs-comment">//access flags 0x1</span><br><span class="hljs-keyword">public</span> &lt;<span class="hljs-keyword">init</span>&gt;()V<br><br>...<br><br><span class="hljs-meta">@LKotlin</span>/Metadata;(mv=&#123;<span class="hljs-number">1</span>,<span class="hljs-number">1</span>,<span class="hljs-number">13</span>&#125;, bv=&#123;<span class="hljs-number">1</span>,<span class="hljs-number">0</span>,<span class="hljs-number">3</span>&#125;, k=<span class="hljs-number">1</span>, d1=&#123;<span class="hljs-string">&quot;\u0000\u000c\n\u0002 ....&quot;</span>&#125;, d2=&#123;<span class="hljs-string">&quot;Lcom/zane/demo/HelloWorld;&quot;</span>, <span class="hljs-string">&quot;&quot;</span>, <span class="hljs-string">&quot;()V&quot;</span>, <span class="hljs-string">&quot;Chapter1_JavaBasics_main&quot;</span>&#125;)<br><span class="hljs-comment">//compiled from: HelloWorld.kt</span><br>&#125;<br><br>Kotlin是通过Metadata注解来实现反射的。<br><br>Tip：混淆时要保留签名信息(如果没有用到反射，就不需要注意了)<br>- keep <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">kotlin</span>.<span class="hljs-title">Metadata</span> </span>&#123;*;&#125;<br></code></pre></td></tr></table></figure>
+
+<h4 id="三、题目结论："><a href="#三、题目结论：" class="headerlink" title="三、题目结论："></a>三、题目结论：</h4><ul>
+<li>Java泛型采用类型擦除实现（Java的实现机制就是类型擦除）</li>
+<li>类型编译时被擦除为Object，所以不兼容基本类型</li>
+<li>类型擦除的实现方案主要考虑后向兼容</li>
+<li>泛型类型签名信息特定场景下反射可获取</li>
+</ul>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/%E9%9D%A2%E8%AF%95/">面试</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2021/04/26/%E9%9D%A2%E8%AF%95%E9%A2%98%E5%9B%9B%EF%BC%9A%E6%80%8E%E6%A0%B7%E7%90%86%E8%A7%A3Java%E7%9A%84%E6%96%B9%E6%B3%95%E5%88%86%E6%B4%BE%EF%BC%9F/">
+                        <span class="hidden-mobile">面试题四：怎样理解Java的方法分派？</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/debouncer.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/tocbot@4.12.0/dist/tocbot.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4.3.0/anchor.min.js" ></script>
+
+
+
+  <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2.0.6/dist/clipboard.min.js" ></script>
+
+
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2.0.11/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+      typing(title)
+      
+    })(window, document);
+  </script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+  <script>
+    (function () {
+      var path = "/local-search.xml";
+      $('#local-search-input').on('click', function() {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      });
+      $('#modalSearch').on('shown.bs.modal', function() {
+        $('#local-search-input').focus();
+      });
+    })()
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>
