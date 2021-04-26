@@ -185,7 +185,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      8.1k 字
+      4.4k 字
     </span>
   
 
@@ -195,7 +195,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      94
+      52
        分钟
     </span>
   
@@ -299,7 +299,7 @@
 <p>基本信息</p>
 <p>男 | 本科 | 6年工作经验 | 长沙</p>
 <p>TEL：19973310316</p>
-<p>Email：<a href="mailto:&#x63;&#x68;&#122;&#x68;&#x67;&#x6f;&#x6f;&#x40;&#49;&#54;&#51;&#x2e;&#99;&#111;&#109;">&#x63;&#x68;&#122;&#x68;&#x67;&#x6f;&#x6f;&#x40;&#49;&#54;&#51;&#x2e;&#99;&#111;&#109;</a></p>
+<p>Email：<a href="mailto:&#x63;&#104;&#122;&#x68;&#x67;&#x6f;&#x6f;&#x40;&#49;&#54;&#51;&#x2e;&#x63;&#x6f;&#109;">&#x63;&#104;&#122;&#x68;&#x67;&#x6f;&#x6f;&#x40;&#49;&#54;&#51;&#x2e;&#x63;&#x6f;&#109;</a></p>
 <p>期望岗位：Android工程师</p>
 <p>期望工作城市：长沙</p>
 <p>项目经历</p>
@@ -326,213 +326,6 @@
 <p><strong>推荐两本书：Java虚拟机规范、Java语言规范</strong></p>
 <p>八、面试题</p>
 <ul>
-<li><p>六、如何停止一个线程？</p>
-<p>面试官视角：这道题想考察什么？</p>
-<ul>
-<li>是否对线程的用法有了解</li>
-<li>是否对线程的stop方法有了解</li>
-<li>是否对线程stop过程中存在的问题有认识</li>
-<li>是否熟悉interrupt中断的用法</li>
-<li>是否能解释清楚使用boolean标志位的好处</li>
-<li>是否知道interrupt底层的细节</li>
-<li>通过该题目能够转移话题到线程安全，并阐述无误</li>
-</ul>
-<p>题目剖析：</p>
-<p>1、<code>void stop()</code>、<code>void stop(Throwable obj)</code>，这两个线程停止的方法已经在Jdk1.1版本被废弃了，连同着暂停和继续的方法也被废弃了。</p>
-<blockquote>
-<p>为什么被废弃呢？因为直接停止线程是不安全的。</p>
-<p>场景：</p>
-<p>Thread1运行，对内存加锁写入中，此时Thread2也想访问这块内存，但它已经拿不到内存锁了，因为Thread1在访问，那么Thread2就会处于阻塞状态，等待内存锁释放，而此时Thread1被暂停了，但它仍持有内存锁，因此Thread2仍然处于阻塞状态，那暂停之后会不会恢复呢，不知道，如果不会恢复的话，那Thread2就得一直等着，这样就会导致一些运行上的问题，万一Thread2还持有了Thread1想要的锁，那就是死锁了。</p>
-<p>此时情况又发生了变化，Thread1被直接停止了，那它会立即释放内存锁，根本没有缓冲的时间，直接停止，直接干掉，假如原本在内存中写入数据，写到一半被停止了，而此时Thread2将会获得内存锁，开始等待CPU的时间片，当获取到时间片访问内存时，发现内存状态异常，这是因为Thread1还没有执行完，就被停止了，留下了烂摊子给Thread2，那Thread2估计也得面临crash，正是因为有这种原因，官方就把线程停止的方法给废弃了，连同着暂停和继续的方法也被废弃了。</p>
-</blockquote>
-<p>  2、如何设计可以随时被中断而取消的任务线程？</p>
-<p>  线程在设计过程中，主要是任务执行的设计，线程往往与任务是强绑定的，任务执行完了，线程也就结束了。虽然现在线程不能在执行过程中被直接停止，但任务的执行是可以停止的，所以线程的运行模式，其实是个协作的任务执行模式，我们想让线程结束，其目的是想要任务结束。</p>
-<p>  因此在设计上，我们应该在任务上添加中断方式：</p>
-<ul>
-<li><p>interrupt</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs java">  目标线程：<br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">InterruptableThread</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Thread</span> </span>&#123;<br>	<span class="hljs-meta">@Override</span><br>	<span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">run</span><span class="hljs-params">()</span> </span>&#123;<br>		<span class="hljs-keyword">try</span> &#123;<br>			sleep(<span class="hljs-number">5000</span>);<br>		&#125;<span class="hljs-keyword">catch</span>(InterruptedException e) &#123;<br>			System.out.println(<span class="hljs-string">&quot;interrupted!&quot;</span>);<br>		&#125;<br>	&#125;<br>&#125;<br><br>中断通知：<br><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">interruptAThread</span><span class="hljs-params">()</span> </span>&#123;<br>  Thread thread = <span class="hljs-keyword">new</span> InterruptableThread();<br>  thread.start();<br>  <span class="hljs-keyword">try</span> &#123;<br>    Thread.sleep(<span class="hljs-number">2000</span>);<br>  &#125;<span class="hljs-keyword">catch</span>(InterruptedException e) &#123;<br>    e.printStackTrace();<br>  &#125;<br>  thread.interrupt();<br>&#125;<br></code></pre></td></tr></table></figure>
-
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><code class="hljs java">  interrupt有的情况也是不支持的！<br><br>目标线程：<br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">UninterruptableThread</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Thread</span> </span>&#123;<br>  <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">run</span><span class="hljs-params">()</span> </span>&#123;<br>    <span class="hljs-keyword">super</span>.run();<br>    <span class="hljs-comment">// 在for循环中，循环很多次的时候，是不支持interrupt的</span><br>    <span class="hljs-keyword">for</span>(<span class="hljs-keyword">int</span> i=<span class="hljs-number">0</span>;i&lt;<span class="hljs-number">100000</span>;i++) &#123;<br>      <span class="hljs-keyword">if</span>(i%<span class="hljs-number">10000</span> == <span class="hljs-number">0</span>) &#123;<br>        System.out.println(i);<br>      &#125;<br>    &#125;<br>  &#125;<br>&#125;<br><br>中断通知：<br><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">cannotInterruptAThread</span><span class="hljs-params">()</span> </span>&#123;<br>  Thread thread = <span class="hljs-keyword">new</span> UninterruptableThread();<br>  thread.start();<br>  thread.interrupt();<br>&#125;<br><br>想要支持interrupt，可以修改一下目标线程：<br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">InterruptableThread1</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Thread</span> </span>&#123;<br>  <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">run</span><span class="hljs-params">()</span> </span>&#123;<br>    <span class="hljs-keyword">super</span>.run();<br>    <span class="hljs-keyword">for</span>(<span class="hljs-keyword">int</span> i=<span class="hljs-number">0</span>;i&lt;<span class="hljs-number">100000</span>;i++) &#123;<br>      <span class="hljs-comment">// 每次循环都调用一下interrupt()，确认有没有中断通知，如果收到中断通知了，这个时候我们也可以中断，也可以不中断，当然按照中断模式来的话，就停止任务，此时线程也就结束了</span><br>      <span class="hljs-comment">// 关于中断状态的读取，有两个方法：</span><br>      <span class="hljs-comment">// 1、interrupted()，是静态方法，获取当前线程的中断状态，并清空</span><br>      <span class="hljs-comment">// 1.1 当前运行的线程</span><br>      <span class="hljs-comment">// 1.2 中断状态调用后清空，重复调用后续返回false【thread.cc代码中：SetInterruptedLocked(false); // 清空当前中断状态】</span><br>      <span class="hljs-comment">//</span><br>      <span class="hljs-comment">// 2、isInterrupted()，是非静态方法，获取该线程的中断状态，不清空</span><br>      <span class="hljs-comment">// 2.1 调用的线程对象对应的线程</span><br>      <span class="hljs-comment">// 2.2 可重复调用，中断清空前一直返回true</span><br>      <span class="hljs-keyword">if</span>(interrupted()) &#123;<br>        <span class="hljs-keyword">break</span>;<br>      &#125;<br>      <span class="hljs-keyword">if</span>(i%<span class="hljs-number">10000</span> == <span class="hljs-number">0</span>) &#123;<br>        System.out.println(i);<br>      &#125;<br>    &#125;<br>  &#125;<br>&#125;<br><br>中断通知：<br><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">handleInterruptionThread</span><span class="hljs-params">()</span> </span>&#123;<br>  Thread thread = <span class="hljs-keyword">new</span> InterruptableThread1();<br>  thread.start();<br>  thread.interrupt();<br>&#125;<br></code></pre></td></tr></table></figure></li>
-<li><p>boolean标志位</p>
-<p>其实interrupt代码逻辑底层也使用了boolean标志位，只是底层代码实现时还加了锁。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs java">  目标线程：<br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">InterruptableThread</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Thread</span> </span>&#123;<br>  <span class="hljs-comment">// boolean isStopped = false; // 此时的isStopped没有加锁，会存在线程间可见性问题，就是在中断通知那里改了true，这里未必能看得到，这是因为Java的内存模型导致的。</span><br>  <span class="hljs-comment">// 为了保证线程间可见性，需要加一个volatile，告诉虚拟机，这个字段是易变的，易变的意思就是，哪里改了这个字段的内容，我这里就得看到。</span><br>  <span class="hljs-keyword">volatile</span> <span class="hljs-keyword">boolean</span> isStopped = <span class="hljs-keyword">false</span>;<br>  <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">run</span><span class="hljs-params">()</span> </span>&#123;<br>    <span class="hljs-keyword">super</span>.run();<br>    <span class="hljs-keyword">for</span>(<span class="hljs-keyword">int</span> i=<span class="hljs-number">0</span>;i&lt;<span class="hljs-number">100000</span>;i++) &#123;<br>      <span class="hljs-keyword">if</span>(isStopped) &#123;<br>        <span class="hljs-keyword">return</span>;<br>      &#125;<br>    &#125;<br>  &#125;<br>&#125;<br><br>中断通知：<br><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">booleanFlag</span><span class="hljs-params">()</span> </span>&#123;<br>  InterruptableThread thread = <span class="hljs-keyword">new</span> InterruptableThread();<br>  thread.start();<br>  ...<br>  thread.isStopped = <span class="hljs-keyword">true</span>;<br>  ...<br>&#125;<br></code></pre></td></tr></table></figure></li>
-<li><p>interrupt与boolean标志位对比</p>
-<table>
-<thead>
-<tr>
-<th></th>
-<th>interrupt</th>
-<th>boolean</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>系统方法(sleep)</td>
-<td>是</td>
-<td>否</td>
-</tr>
-<tr>
-<td>使用JNI</td>
-<td>是</td>
-<td>否</td>
-</tr>
-<tr>
-<td>加锁</td>
-<td>是</td>
-<td>否</td>
-</tr>
-<tr>
-<td>触发方式</td>
-<td>抛异常</td>
-<td>布尔值判断，也可抛异常</td>
-</tr>
-</tbody></table>
-<ul>
-<li><p>需要支持系统方法时用中断（功能性）</p>
-<ul>
-<li>其他情况用boolean标志位（性能）</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-<p>  题目结论：</p>
-<ul>
-<li>为什么线程不应该被直接stop？因为涉及到资源清理的问题，可能会给其它线程留下烂摊子。</li>
-<li>线程内置中断机制的使用与原理：通过volatile、boolean标志位通知线程停止</li>
-</ul>
-</li>
-<li><p>七、如何写出线程安全的程序？</p>
-<p>面试官视角：这道题想考察什么？</p>
-<ul>
-<li>是否对线程安全有初步了解</li>
-<li>是否对线程安全的产生原因有思考</li>
-<li>是否知道final，volatile关键字的作用</li>
-<li>是否清楚JDK 1.5之前Java DCL为什么有缺陷</li>
-<li>是否清楚的知道如何编写线程安全的程序</li>
-<li>是否对ThreadLocal的使用注意事项有认识</li>
-</ul>
-<p>题目剖析：</p>
-<p>1、什么是线程安全问题？</p>
-<blockquote>
-<p>场景：</p>
-<p>假如有三个线程在访问CPU和内存，它们分别为：Thread1、Thread2和Thread3，每一个线程都有一个自己的内存副本（工作内存1、工作内存2和工作内存3），内存副本其实就是Java的内存模型，此时这三个线程同时触发 ++ 运算，比如Thread1先去它自己对应的工作内存1中进行 ++ 运算，比如从5++到了6，此时主内存的数值还是5，其它两个线程对应的内存副本的数值也都还是5，那么问题来了，数值还没来得及同步呢，这个时候Thread2也对自己对应的工作内存2进行 ++ 运算，从5++到了6，这个时候可能是时间片的原因或其它原因，Thread1才把它的工作内存1的数据同步到主内存中，此时主内存的数值变成了6，接下来主内存发了一个指令，要把它自己的数值刷新到其它的内存副本中，这个时候Thread1、Thread2和Thread3对应的工作内存3的数值都变成了6，那么问题又来了，Thread2它自己已经完成了一次 ++ 运算，它本身已经从5++到了6了，按理来说Thread1和Thread2都已经进行 ++ 运算了，主内存的数值应该是7，但现在的结果却还是6，这是不是就出现了不一致的情况，再比如Thread3也进行了 ++ 运算，从6++到了7，这结果也不对，应该是8，因为这三个线程都进行了 ++ 运算，应该是从5+3=8，这就是线程安全问题。</p>
-<p><strong>结论：线程安全问题本质上就是可变资源（内存）线程间共享的问题；不可变、不共享是没有线程安全问题的。</strong></p>
-<p>扩展：进程有安全问题吗？</p>
-<p>没有；因为进程之间只共享CPU时间片（抢时间片），进程之间的内存是相互独立的，一旦进程被kill了，其所拥有的内存都会还给物理内存，但线程是存在于进程当中的，同一个进程中的线程是可以共享内存资源的。</p>
-</blockquote>
-<p>2、如何实现线程安全？</p>
-<ul>
-<li><p>不共享资源</p>
-<ul>
-<li><p>可重入函数</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">// 可重入函数</span><br><span class="hljs-comment">// 什么是可重入函数：传入一个参数进来，经过一系列的运算，再返回一个值出去，中间不会涉及到任何的外部内存的访问、修改，这就叫可重入函数，它没有副作用。</span><br><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">int</span> <span class="hljs-title">addTwo</span><span class="hljs-params">(<span class="hljs-keyword">int</span> num)</span> </span>&#123;<br>    <span class="hljs-keyword">return</span> num + <span class="hljs-number">2</span>;<br>&#125;<br></code></pre></td></tr></table></figure></li>
-<li><p>使用ThreadLocal</p>
-<blockquote>
-<p>上面的 ++ 运算的例子可以看出来，虽然在每一个线程当中都会去访问这个值（数值5），但最终访问的是自己的线程当中的内存副本里面的数值5。</p>
-<p>比如下面的例子：</p>
-<p>这个token的使用场景就是，一个服务器提供很多服务，每一个用户请求进来，都会开一个线程为他提供服务，所以每一个用户属于不同的线程，那么每一个线程去访问这个token，都是不一样的，都有一个属于自己的String类型的副本token，这样的话就不会互相干扰，这样的好处就是，因为不共享资源，所以没有线程安全的问题。</p>
-</blockquote>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">final</span> <span class="hljs-keyword">static</span> ThreadLocal&lt;String&gt; token = <span class="hljs-keyword">new</span> ThreadLocal&lt;&gt;();<br><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">threadLocal</span><span class="hljs-params">()</span> </span>&#123;<br>  Runnable runnable = () -&gt; &#123;<br>    token.set(UUID.randomUUID().toString());<br>    ...<br>    System.out.println(<span class="hljs-string">&quot;e.&quot;</span> + Thread.currentThread().getName()+<span class="hljs-string">&quot;:&quot;</span>+token.get());<br>  &#125;;<br>  <br>  startThread(<span class="hljs-number">5</span>, runnable);<br>&#125;<br></code></pre></td></tr></table></figure>
-
-<p>深入：ThreadLocal剖析（ThreadLocal.java）：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">set</span><span class="hljs-params">(T value)</span> </span>&#123;<br>  Thread t = Thread.currentThread();<br>  ThreadLocalMap map = getMap(t);<br>  <span class="hljs-keyword">if</span>(map != <span class="hljs-keyword">null</span>) &#123;<br>    <span class="hljs-comment">// key：this，就是ThreadLocal</span><br>    <span class="hljs-comment">// value：你想要传入的值</span><br>    map.set(<span class="hljs-keyword">this</span>, value);<br>  &#125;<span class="hljs-keyword">else</span> &#123;<br>    createMap(t, value);<br>  &#125;<br>&#125;<br><br><span class="hljs-comment">// ThreadLocalMap存在线程上的</span><br><span class="hljs-function">ThreadLocalMap <span class="hljs-title">getMap</span><span class="hljs-params">(Thread t)</span> </span>&#123;<br>  <span class="hljs-keyword">return</span> t.threadLocal;<br>&#125;<br><br><span class="hljs-comment">// 结论：ThreadLocal本质上是一个绑定在了线程上的一个ThreadLocalMap；如果我和你的线程不一样，那么值一定是不一样的。</span><br></code></pre></td></tr></table></figure>
-
-<p>ThreadLoalMap 与 WeakHashMap：</p>
-<table>
-<thead>
-<tr>
-<th></th>
-<th>ThreadLocalMap</th>
-<th>WeakHashMap</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>对象持有</td>
-<td>弱引用</td>
-<td>弱引用</td>
-</tr>
-<tr>
-<td>对象GC回收</td>
-<td>不影响</td>
-<td>不影响</td>
-</tr>
-<tr>
-<td>引用清除策略</td>
-<td>1、主动移除<br />2、线程退出时移除</td>
-<td>1、主动移除<br />2、GC 后移除（ReferenceQueue）</td>
-</tr>
-<tr>
-<td>Hash冲突</td>
-<td>开放定址法</td>
-<td>单链表法</td>
-</tr>
-<tr>
-<td>Hash计算</td>
-<td>神奇数字的倍数</td>
-<td>对象hashCode再散列</td>
-</tr>
-<tr>
-<td>适用场景</td>
-<td>对象较少</td>
-<td>通用</td>
-</tr>
-</tbody></table>
-<p>ThreadLocal的使用建议：</p>
-<ul>
-<li><p>声明为全局静态final成员</p>
-<p>ThreadLocal在一个线程当中有一个实例就够了，没必要每次创建的时候都去弄一个出来，我们知道使用ThreadLocalMap对象set()的时候，它是以ThreadLocal为key的，所以如果不断的去变化ThreadLocal的对象引用的话，那些对象set()进去就永远找不到了；如果不声明为全局静态final成员的话，还有另外一个问题就是，可见性问题。</p>
-</li>
-<li><p>避免存储大量对象</p>
-<p>这是由底层的数据结构决定的</p>
-</li>
-<li><p>用完后及时移除对象</p>
-<p>因为ThreadLocal本身没有监听机制</p>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-<li><p>共享不可变资源</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">FinalFieldExample</span> </span>&#123;<br>  <span class="hljs-keyword">final</span> <span class="hljs-keyword">int</span> x;<br>  <span class="hljs-keyword">int</span> y;<br>  <br>  <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">FinalFieldExample</span><span class="hljs-params">()</span> </span>&#123;<br>    x = <span class="hljs-number">3</span>;<br>    y = <span class="hljs-number">4</span>;<br>  &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
-
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">static</span> FinalFieldExample f;<br><span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">writer</span><span class="hljs-params">()</span> </span>&#123;<br>  f = <span class="hljs-keyword">new</span> FinalFieldExample();<br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">reader</span><span class="hljs-params">()</span> </span>&#123;<br>  <span class="hljs-keyword">if</span>(f != <span class="hljs-keyword">null</span>) &#123;<br>    <span class="hljs-keyword">int</span> i = f.x;<br>    <span class="hljs-keyword">int</span> j = f.y;<br>  &#125;<br>&#125;<br><br><span class="hljs-comment">// writer 和 reader是两个线程</span><br><span class="hljs-comment">// 我们所期望的i 和 j的值是：i=3，j=4</span><br><span class="hljs-comment">// 但实际情况，有可能是i=3，j=0，这个取决于虚拟机的实现或者cpu的架构的特征，从而来决定指令会不会重排序，如果重排序的话，首先会将非final的成员，重排序到构造方法之外，如上面的示例，因为 x 是final的，所以 x 一定会在构造方法之内被赋值，但 y 是非final的，有可能构造方法执行完了，y的赋值操作还没有弄完，但在reader线程中，发现 f 已经不为null了，可以读值了，所以有可能 i=3，j=0的情况存在。</span><br><span class="hljs-comment">// 结论：被final修饰的变量、方法以及类，不仅不能被修改、不能被覆写、不能被继承，而且还禁止重排序。</span><br></code></pre></td></tr></table></figure>
-
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Singleton</span> </span>&#123;<br>  <span class="hljs-keyword">private</span> <span class="hljs-keyword">volatile</span> <span class="hljs-keyword">static</span> Singleton singleton;<br>  <span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-title">Singleton</span><span class="hljs-params">()</span> </span>&#123;&#125;<br>  <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> Singleton <span class="hljs-title">getInstance</span><span class="hljs-params">()</span> </span>&#123;<br>    <span class="hljs-comment">// 判断是否为null</span><br>    <span class="hljs-keyword">if</span>(singleton == <span class="hljs-keyword">null</span>) &#123;<br>      <span class="hljs-comment">// 是null，加锁</span><br>      <span class="hljs-keyword">synchronized</span>(Singleton.class) &#123;<br>        <span class="hljs-comment">// 再判断是否为null</span><br>        <span class="hljs-keyword">if</span>(singleton == <span class="hljs-keyword">null</span>) &#123;<br>          <span class="hljs-comment">// 还为null，开始初始化，先调用构造方法，再赋值给singleton</span><br>          singleton = <span class="hljs-keyword">new</span> Singleton();<br>        &#125;<br>      &#125;<br>    &#125;<br>    <span class="hljs-keyword">return</span> singleton;<br>  &#125;<br>&#125;<br><br><span class="hljs-comment">// jdk1.5之后，volatile语义被增强了，除了保证线程间可见性，还有禁止重排序功能，所以写DCL（单例）的时候，把volatile加上。</span><br><span class="hljs-comment">// 上面的示例如果不加volatile的话，有可能出现类似于重排序的问题，可能在锁里面就把singleton给赋值了，但是构造方法还没执行完，那其它线程有可能就会拿到一个没有被初始化完的singleton的引用，这样就会引发问题。</span><br></code></pre></td></tr></table></figure></li>
-<li><p>共享可变资源</p>
-<ul>
-<li><p>保证可见性（你改了，我看得到）</p>
-<ul>
-<li><p>使用final关键字</p>
-</li>
-<li><p>使用volatile关键字</p>
-</li>
-<li><p>加锁，锁释放时会强制将缓存刷新到主内存</p>
-<p>加锁只是对另外跟你同样争用同一个锁的那些线程才能保证可见性，而且加锁的话，会在锁释放时强制将缓存刷新到主内存当中，这就是为什么其它线程加锁了才能看到我刷新到主内存的这个值，原因就在于，它只有加锁了，它才会去从主内存当中刷新，不然的话，它有可能就拿着自己的内存副本去读了（上面的 ++ 运算示例就是因为没有加锁、没有保证可见性也没有保证操作原子性）</p>
-</li>
-</ul>
-</li>
-<li><p>保证操作原子性（你在改，我就不能改，我在改，你就不能改；反例：上面的 ++ 运算，你改我也改）</p>
-</li>
-<li><p>加锁，保证操作的互斥性</p>
-</li>
-<li><p>使用CAS指令（如Unsafe.compareAndSwapInt）</p>
-<p>  Unsafe不是公开的，需要用反射才能获取到</p>
-</li>
-<li><p>使用原子数值类型（如AtomicInteger）</p>
-<ul>
-<li>使用原子属性更新器（AtomicRerenceFieldUpdater）</li>
-</ul>
-</li>
-<li><p>禁止重排序（加不加final，那执行顺序就是不一样）</p>
-<ul>
-<li>使用final关键字</li>
-<li>使用volatile关键字</li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
 <li><p>八、ConcurrentHashMap如何支持并发访问？</p>
 <p>面试官视角：这道题想考察什么？</p>
 <ul>

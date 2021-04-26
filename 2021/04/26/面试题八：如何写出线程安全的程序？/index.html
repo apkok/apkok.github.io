@@ -1,0 +1,573 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=&#34;auto&#34;>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon.png">
+  <link rel="icon" href="/img/favicon.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="">
+  <meta name="author" content="Apkok">
+  <meta name="keywords" content="">
+  
+  <title>面试题八：如何写出线程安全的程序？ - 星海渤文</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10.4.0/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
+  
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"apkok.github.io","root":"/","version":"1.8.9-a","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null}}};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>星海渤文</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;</a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" href="javascript:">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('/img/default.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="面试题八：如何写出线程安全的程序？">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2021-04-26 16:22" pubdate>
+        2021年4月26日 下午
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      2.2k 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      25
+       分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">面试题八：如何写出线程安全的程序？</h1>
+            
+            <div class="markdown-body">
+              <h3 id="如何写出线程安全的程序？"><a href="#如何写出线程安全的程序？" class="headerlink" title="如何写出线程安全的程序？"></a>如何写出线程安全的程序？</h3><h4 id="一、面试官视角：这道题想考察什么？"><a href="#一、面试官视角：这道题想考察什么？" class="headerlink" title="一、面试官视角：这道题想考察什么？"></a>一、面试官视角：这道题想考察什么？</h4><ul>
+<li>是否对线程安全有初步了解</li>
+<li>是否对线程安全的产生原因有思考</li>
+<li>是否知道final，volatile关键字的作用</li>
+<li>是否清楚JDK 1.5之前Java DCL为什么有缺陷</li>
+<li>是否清楚的知道如何编写线程安全的程序</li>
+<li>是否对ThreadLocal的使用注意事项有认识</li>
+</ul>
+<h4 id="二、题目剖析："><a href="#二、题目剖析：" class="headerlink" title="二、题目剖析："></a>二、题目剖析：</h4><p>1、什么是线程安全问题？</p>
+<blockquote>
+<p>场景：</p>
+<p>假如有三个线程在访问CPU和内存，它们分别为：Thread1、Thread2和Thread3，每一个线程都有一个自己的内存副本（工作内存1、工作内存2和工作内存3），内存副本其实就是Java的内存模型，此时这三个线程同时触发 ++ 运算，比如Thread1先去它自己对应的工作内存1中进行 ++ 运算，比如从5++到了6，此时主内存的数值还是5，其它两个线程对应的内存副本的数值也都还是5，那么问题来了，数值还没来得及同步呢，这个时候Thread2也对自己对应的工作内存2进行 ++ 运算，从5++到了6，这个时候可能是时间片的原因或其它原因，Thread1才把它的工作内存1的数据同步到主内存中，此时主内存的数值变成了6，接下来主内存发了一个指令，要把它自己的数值刷新到其它的内存副本中，这个时候Thread1、Thread2和Thread3对应的工作内存3的数值都变成了6，那么问题又来了，Thread2它自己已经完成了一次 ++ 运算，它本身已经从5++到了6了，按理来说Thread1和Thread2都已经进行 ++ 运算了，主内存的数值应该是7，但现在的结果却还是6，这是不是就出现了不一致的情况，再比如Thread3也进行了 ++ 运算，从6++到了7，这结果也不对，应该是8，因为这三个线程都进行了 ++ 运算，应该是从5+3=8，这就是线程安全问题。</p>
+<p><strong>结论：线程安全问题本质上就是可变资源（内存）线程间共享的问题；不可变、不共享是没有线程安全问题的。</strong></p>
+<p>扩展：进程有安全问题吗？</p>
+<p>没有；因为进程之间只共享CPU时间片（抢时间片），进程之间的内存是相互独立的，一旦进程被kill了，其所拥有的内存都会还给物理内存，但线程是存在于进程当中的，同一个进程中的线程是可以共享内存资源的。</p>
+</blockquote>
+<p>2、如何实现线程安全？</p>
+<ul>
+<li><p>不共享资源</p>
+<ul>
+<li><p>可重入函数</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">// 可重入函数</span><br><span class="hljs-comment">// 什么是可重入函数：传入一个参数进来，经过一系列的运算，再返回一个值出去，中间不会涉及到任何的外部内存的访问、修改，这就叫可重入函数，它没有副作用。</span><br><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">int</span> <span class="hljs-title">addTwo</span><span class="hljs-params">(<span class="hljs-keyword">int</span> num)</span> </span>&#123;<br>    <span class="hljs-keyword">return</span> num + <span class="hljs-number">2</span>;<br>&#125;<br></code></pre></td></tr></table></figure></li>
+<li><p>使用ThreadLocal</p>
+<blockquote>
+<p>上面的 ++ 运算的例子可以看出来，虽然在每一个线程当中都会去访问这个值（数值5），但最终访问的是自己的线程当中的内存副本里面的数值5。</p>
+<p>比如下面的例子：</p>
+<p>这个token的使用场景就是，一个服务器提供很多服务，每一个用户请求进来，都会开一个线程为他提供服务，所以每一个用户属于不同的线程，那么每一个线程去访问这个token，都是不一样的，都有一个属于自己的String类型的副本token，这样的话就不会互相干扰，这样的好处就是，因为不共享资源，所以没有线程安全的问题。</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">final</span> <span class="hljs-keyword">static</span> ThreadLocal&lt;String&gt; token = <span class="hljs-keyword">new</span> ThreadLocal&lt;&gt;();<br><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">threadLocal</span><span class="hljs-params">()</span> </span>&#123;<br>  Runnable runnable = () -&gt; &#123;<br>    token.set(UUID.randomUUID().toString());<br>    ...<br>    System.out.println(<span class="hljs-string">&quot;e.&quot;</span> + Thread.currentThread().getName()+<span class="hljs-string">&quot;:&quot;</span>+token.get());<br>  &#125;;<br>  <br>  startThread(<span class="hljs-number">5</span>, runnable);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>深入：ThreadLocal剖析（ThreadLocal.java）：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">set</span><span class="hljs-params">(T value)</span> </span>&#123;<br>  Thread t = Thread.currentThread();<br>  ThreadLocalMap map = getMap(t);<br>  <span class="hljs-keyword">if</span>(map != <span class="hljs-keyword">null</span>) &#123;<br>    <span class="hljs-comment">// key：this，就是ThreadLocal</span><br>    <span class="hljs-comment">// value：你想要传入的值</span><br>    map.set(<span class="hljs-keyword">this</span>, value);<br>  &#125;<span class="hljs-keyword">else</span> &#123;<br>    createMap(t, value);<br>  &#125;<br>&#125;<br><br><span class="hljs-comment">// ThreadLocalMap存在线程上的</span><br><span class="hljs-function">ThreadLocalMap <span class="hljs-title">getMap</span><span class="hljs-params">(Thread t)</span> </span>&#123;<br>  <span class="hljs-keyword">return</span> t.threadLocal;<br>&#125;<br><br><span class="hljs-comment">// 结论：ThreadLocal本质上是一个绑定在了线程上的一个ThreadLocalMap；如果我和你的线程不一样，那么值一定是不一样的。</span><br></code></pre></td></tr></table></figure>
+
+<p>ThreadLoalMap 与 WeakHashMap：</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>ThreadLocalMap</th>
+<th>WeakHashMap</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>对象持有</td>
+<td>弱引用</td>
+<td>弱引用</td>
+</tr>
+<tr>
+<td>对象GC回收</td>
+<td>不影响</td>
+<td>不影响</td>
+</tr>
+<tr>
+<td>引用清除策略</td>
+<td>1、主动移除<br />2、线程退出时移除</td>
+<td>1、主动移除<br />2、GC 后移除（ReferenceQueue）</td>
+</tr>
+<tr>
+<td>Hash冲突</td>
+<td>开放定址法</td>
+<td>单链表法</td>
+</tr>
+<tr>
+<td>Hash计算</td>
+<td>神奇数字的倍数</td>
+<td>对象hashCode再散列</td>
+</tr>
+<tr>
+<td>适用场景</td>
+<td>对象较少</td>
+<td>通用</td>
+</tr>
+</tbody></table>
+<p>ThreadLocal的使用建议：</p>
+<ul>
+<li><p>声明为全局静态final成员</p>
+<blockquote>
+<p>ThreadLocal在一个线程当中有一个实例就够了，没必要每次创建的时候都去弄一个出来，我们知道使用ThreadLocalMap对象set()的时候，它是以ThreadLocal为key的，所以如果不断的去变化ThreadLocal的对象引用的话，那些对象set()进去就永远找不到了；如果不声明为全局静态final成员的话，还有另外一个问题就是，可见性问题。</p>
+</blockquote>
+</li>
+<li><p>避免存储大量对象</p>
+<blockquote>
+<p>这是由底层的数据结构决定的</p>
+</blockquote>
+</li>
+<li><p>用完后及时移除对象</p>
+<blockquote>
+<p>因为ThreadLocal本身没有监听机制</p>
+</blockquote>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>共享不可变资源</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">FinalFieldExample</span> </span>&#123;<br>  <span class="hljs-keyword">final</span> <span class="hljs-keyword">int</span> x;<br>  <span class="hljs-keyword">int</span> y;<br>  <br>  <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">FinalFieldExample</span><span class="hljs-params">()</span> </span>&#123;<br>    x = <span class="hljs-number">3</span>;<br>    y = <span class="hljs-number">4</span>;<br>  &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">static</span> FinalFieldExample f;<br><span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">writer</span><span class="hljs-params">()</span> </span>&#123;<br>  f = <span class="hljs-keyword">new</span> FinalFieldExample();<br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">reader</span><span class="hljs-params">()</span> </span>&#123;<br>  <span class="hljs-keyword">if</span>(f != <span class="hljs-keyword">null</span>) &#123;<br>    <span class="hljs-keyword">int</span> i = f.x;<br>    <span class="hljs-keyword">int</span> j = f.y;<br>  &#125;<br>&#125;<br><br><span class="hljs-comment">// writer 和 reader是两个线程</span><br><span class="hljs-comment">// 我们所期望的i 和 j的值是：i=3，j=4</span><br><span class="hljs-comment">// 但实际情况，有可能是i=3，j=0，这个取决于虚拟机的实现或者cpu的架构的特征，从而来决定指令会不会重排序，如果重排序的话，首先会将非final的成员，重排序到构造方法之外，如上面的示例，因为 x 是final的，所以 x 一定会在构造方法之内被赋值，但 y 是非final的，有可能构造方法执行完了，y的赋值操作还没有弄完，但在reader线程中，发现 f 已经不为null了，可以读值了，所以有可能 i=3，j=0的情况存在。</span><br><span class="hljs-comment">// 结论：被final修饰的变量、方法以及类，不仅不能被修改、不能被覆写、不能被继承，而且还禁止重排序。</span><br></code></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Singleton</span> </span>&#123;<br>  <span class="hljs-keyword">private</span> <span class="hljs-keyword">volatile</span> <span class="hljs-keyword">static</span> Singleton singleton;<br>  <span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-title">Singleton</span><span class="hljs-params">()</span> </span>&#123;&#125;<br>  <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> Singleton <span class="hljs-title">getInstance</span><span class="hljs-params">()</span> </span>&#123;<br>    <span class="hljs-comment">// 判断是否为null</span><br>    <span class="hljs-keyword">if</span>(singleton == <span class="hljs-keyword">null</span>) &#123;<br>      <span class="hljs-comment">// 是null，加锁</span><br>      <span class="hljs-keyword">synchronized</span>(Singleton.class) &#123;<br>        <span class="hljs-comment">// 再判断是否为null</span><br>        <span class="hljs-keyword">if</span>(singleton == <span class="hljs-keyword">null</span>) &#123;<br>          <span class="hljs-comment">// 还为null，开始初始化，先调用构造方法，再赋值给singleton</span><br>          singleton = <span class="hljs-keyword">new</span> Singleton();<br>        &#125;<br>      &#125;<br>    &#125;<br>    <span class="hljs-keyword">return</span> singleton;<br>  &#125;<br>&#125;<br><br><span class="hljs-comment">// jdk1.5之后，volatile语义被增强了，除了保证线程间可见性，还有禁止重排序功能，所以写DCL（单例）的时候，把volatile加上。</span><br><span class="hljs-comment">// 上面的示例如果不加volatile的话，有可能出现类似于重排序的问题，可能在锁里面就把singleton给赋值了，但是构造方法还没执行完，那其它线程有可能就会拿到一个没有被初始化完的singleton的引用，这样就会引发问题。</span><br></code></pre></td></tr></table></figure></li>
+<li><p>共享可变资源</p>
+<ul>
+<li><p>保证可见性（你改了，我看得到）</p>
+<ul>
+<li><p>使用final关键字</p>
+</li>
+<li><p>使用volatile关键字</p>
+</li>
+<li><p>加锁，锁释放时会强制将缓存刷新到主内存</p>
+<blockquote>
+<p>加锁只是对另外跟你同样争用同一个锁的那些线程才能保证可见性，而且加锁的话，会在锁释放时强制将缓存刷新到主内存当中，这就是为什么其它线程加锁了才能看到我刷新到主内存的这个值，原因就在于，它只有加锁了，它才会去从主内存当中刷新，不然的话，它有可能就拿着自己的内存副本去读了（上面的 ++ 运算示例就是因为没有加锁、没有保证可见性也没有保证操作原子性）</p>
+</blockquote>
+</li>
+</ul>
+</li>
+<li><p>保证操作原子性（你在改，我就不能改，我在改，你就不能改；反例：上面的 ++ 运算，你改我也改）</p>
+<ul>
+<li><p>加锁，保证操作的互斥性</p>
+</li>
+<li><p>使用CAS指令（如Unsafe.compareAndSwapInt，Unsafe不是公开的，需要用反射才能获取到）</p>
+</li>
+<li><p>使用原子数值类型（如AtomicInteger）</p>
+</li>
+<li><p>使用原子属性更新器（AtomicRerenceFieldUpdater）</p>
+</li>
+</ul>
+</li>
+<li><p>禁止重排序（加不加final，那执行顺序就是不一样）</p>
+<ul>
+<li>使用final关键字</li>
+<li>使用volatile关键字</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/%E9%9D%A2%E8%AF%95/">面试</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2021/04/26/%E9%9D%A2%E8%AF%95%E9%A2%98%E4%B8%83%EF%BC%9A%E5%A6%82%E4%BD%95%E5%81%9C%E6%AD%A2%E4%B8%80%E4%B8%AA%E7%BA%BF%E7%A8%8B%EF%BC%9F/">
+                        <span class="hidden-mobile">面试题七：如何停止一个线程？</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/debouncer.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/tocbot@4.12.0/dist/tocbot.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4.3.0/anchor.min.js" ></script>
+
+
+
+  <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2.0.6/dist/clipboard.min.js" ></script>
+
+
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2.0.11/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+      typing(title)
+      
+    })(window, document);
+  </script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+  <script>
+    (function () {
+      var path = "/local-search.xml";
+      $('#local-search-input').on('click', function() {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      });
+      $('#modalSearch').on('shown.bs.modal', function() {
+        $('#local-search-input').focus();
+      });
+    })()
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>
