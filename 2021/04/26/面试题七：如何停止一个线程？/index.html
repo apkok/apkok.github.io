@@ -1,0 +1,504 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=&#34;auto&#34;>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon.png">
+  <link rel="icon" href="/img/favicon.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="">
+  <meta name="author" content="Apkok">
+  <meta name="keywords" content="">
+  
+  <title>面试题七：如何停止一个线程？ - 星海渤文</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10.4.0/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
+  
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"apkok.github.io","root":"/","version":"1.8.9-a","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null}}};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>星海渤文</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;</a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" href="javascript:">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('/img/default.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="面试题七：如何停止一个线程？">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2021-04-26 11:39" pubdate>
+        2021年4月26日 中午
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      1.4k 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      16
+       分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">面试题七：如何停止一个线程？</h1>
+            
+            <div class="markdown-body">
+              <h3 id="如何停止一个线程？"><a href="#如何停止一个线程？" class="headerlink" title="如何停止一个线程？"></a>如何停止一个线程？</h3><h4 id="一、面试官视角：这道题想考察什么？"><a href="#一、面试官视角：这道题想考察什么？" class="headerlink" title="一、面试官视角：这道题想考察什么？"></a>一、面试官视角：这道题想考察什么？</h4><ul>
+<li>是否对线程的用法有了解</li>
+<li>是否对线程的stop方法有了解</li>
+<li>是否对线程stop过程中存在的问题有认识</li>
+<li>是否熟悉interrupt中断的用法</li>
+<li>是否能解释清楚使用boolean标志位的好处</li>
+<li>是否知道interrupt底层的细节</li>
+<li>通过该题目能够转移话题到线程安全，并阐述无误</li>
+</ul>
+<h4 id="二、题目剖析："><a href="#二、题目剖析：" class="headerlink" title="二、题目剖析："></a>二、题目剖析：</h4><p>1、<code>void stop()</code>、<code>void stop(Throwable obj)</code>，这两个线程停止的方法已经在Jdk1.1版本被废弃了，连同着暂停和继续的方法也被废弃了。</p>
+<blockquote>
+<p>为什么被废弃呢？因为直接停止线程是不安全的。</p>
+<p>场景：</p>
+<p>Thread1运行，对内存加锁写入中，此时Thread2也想访问这块内存，但它已经拿不到内存锁了，因为Thread1在访问，那么Thread2就会处于阻塞状态，等待内存锁释放，而此时Thread1被暂停了，但它仍持有内存锁，因此Thread2仍然处于阻塞状态，那暂停之后会不会恢复呢，不知道，如果不会恢复的话，那Thread2就得一直等着，这样就会导致一些运行上的问题，万一Thread2还持有了Thread1想要的锁，那就是死锁了。</p>
+<p>此时情况又发生了变化，Thread1被直接停止了，那它会立即释放内存锁，根本没有缓冲的时间，直接停止，直接干掉，假如原本在内存中写入数据，写到一半被停止了，而此时Thread2将会获得内存锁，开始等待CPU的时间片，当获取到时间片访问内存时，发现内存状态异常，这是因为Thread1还没有执行完，就被停止了，留下了烂摊子给Thread2，那Thread2估计也得面临crash，正是因为有这种原因，官方就把线程停止的方法给废弃了，连同着暂停和继续的方法也被废弃了。</p>
+</blockquote>
+<p>2、如何设计可以随时被中断而取消的任务线程？</p>
+<p>线程在设计过程中，主要是任务执行的设计，线程往往与任务是强绑定的，任务执行完了，线程也就结束了。虽然现在线程不能在执行过程中被直接停止，但任务的执行是可以停止的，所以线程的运行模式，其实是个协作的任务执行模式，我们想让线程结束，其目的是想要任务结束。</p>
+<p>因此在设计上，我们应该在任务上添加中断方式：</p>
+<ul>
+<li><p>interrupt</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs java">  目标线程：<br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">InterruptableThread</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Thread</span> </span>&#123;<br>	<span class="hljs-meta">@Override</span><br>	<span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">run</span><span class="hljs-params">()</span> </span>&#123;<br>		<span class="hljs-keyword">try</span> &#123;<br>			sleep(<span class="hljs-number">5000</span>);<br>		&#125;<span class="hljs-keyword">catch</span>(InterruptedException e) &#123;<br>			System.out.println(<span class="hljs-string">&quot;interrupted!&quot;</span>);<br>		&#125;<br>	&#125;<br>&#125;<br><br>中断通知：<br><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">interruptAThread</span><span class="hljs-params">()</span> </span>&#123;<br>  Thread thread = <span class="hljs-keyword">new</span> InterruptableThread();<br>  thread.start();<br>  <span class="hljs-keyword">try</span> &#123;<br>    Thread.sleep(<span class="hljs-number">2000</span>);<br>  &#125;<span class="hljs-keyword">catch</span>(InterruptedException e) &#123;<br>    e.printStackTrace();<br>  &#125;<br>  thread.interrupt();<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><code class="hljs java">  interrupt有的情况也是不支持的！<br><br>目标线程：<br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">UninterruptableThread</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Thread</span> </span>&#123;<br>  <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">run</span><span class="hljs-params">()</span> </span>&#123;<br>    <span class="hljs-keyword">super</span>.run();<br>    <span class="hljs-comment">// 在for循环中，循环很多次的时候，是不支持interrupt的</span><br>    <span class="hljs-keyword">for</span>(<span class="hljs-keyword">int</span> i=<span class="hljs-number">0</span>;i&lt;<span class="hljs-number">100000</span>;i++) &#123;<br>      <span class="hljs-keyword">if</span>(i%<span class="hljs-number">10000</span> == <span class="hljs-number">0</span>) &#123;<br>        System.out.println(i);<br>      &#125;<br>    &#125;<br>  &#125;<br>&#125;<br><br>中断通知：<br><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">cannotInterruptAThread</span><span class="hljs-params">()</span> </span>&#123;<br>  Thread thread = <span class="hljs-keyword">new</span> UninterruptableThread();<br>  thread.start();<br>  thread.interrupt();<br>&#125;<br><br>想要支持interrupt，可以修改一下目标线程：<br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">InterruptableThread1</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Thread</span> </span>&#123;<br>  <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">run</span><span class="hljs-params">()</span> </span>&#123;<br>    <span class="hljs-keyword">super</span>.run();<br>    <span class="hljs-keyword">for</span>(<span class="hljs-keyword">int</span> i=<span class="hljs-number">0</span>;i&lt;<span class="hljs-number">100000</span>;i++) &#123;<br>      <span class="hljs-comment">// 每次循环都调用一下interrupt()，确认有没有中断通知，如果收到中断通知了，这个时候我们也可以中断，也可以不中断，当然按照中断模式来的话，就停止任务，此时线程也就结束了</span><br>      <span class="hljs-comment">// 关于中断状态的读取，有两个方法：</span><br>      <span class="hljs-comment">// 1、interrupted()，是静态方法，获取当前线程的中断状态，并清空</span><br>      <span class="hljs-comment">// 1.1 当前运行的线程</span><br>      <span class="hljs-comment">// 1.2 中断状态调用后清空，重复调用后续返回false【thread.cc代码中：SetInterruptedLocked(false); // 清空当前中断状态】</span><br>      <span class="hljs-comment">//</span><br>      <span class="hljs-comment">// 2、isInterrupted()，是非静态方法，获取该线程的中断状态，不清空</span><br>      <span class="hljs-comment">// 2.1 调用的线程对象对应的线程</span><br>      <span class="hljs-comment">// 2.2 可重复调用，中断清空前一直返回true</span><br>      <span class="hljs-keyword">if</span>(interrupted()) &#123;<br>        <span class="hljs-keyword">break</span>;<br>      &#125;<br>      <span class="hljs-keyword">if</span>(i%<span class="hljs-number">10000</span> == <span class="hljs-number">0</span>) &#123;<br>        System.out.println(i);<br>      &#125;<br>    &#125;<br>  &#125;<br>&#125;<br><br>中断通知：<br><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">handleInterruptionThread</span><span class="hljs-params">()</span> </span>&#123;<br>  Thread thread = <span class="hljs-keyword">new</span> InterruptableThread1();<br>  thread.start();<br>  thread.interrupt();<br>&#125;<br></code></pre></td></tr></table></figure></li>
+<li><p>boolean标志位</p>
+<p>其实interrupt代码逻辑底层也使用了boolean标志位，只是底层代码实现时还加了锁。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs java">  目标线程：<br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">InterruptableThread</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Thread</span> </span>&#123;<br>  <span class="hljs-comment">// boolean isStopped = false; // 此时的isStopped没有加锁，会存在线程间可见性问题，就是在中断通知那里改了true，这里未必能看得到，这是因为Java的内存模型导致的。</span><br>  <span class="hljs-comment">// 为了保证线程间可见性，需要加一个volatile，告诉虚拟机，这个字段是易变的，易变的意思就是，哪里改了这个字段的内容，我这里就得看到。</span><br>  <span class="hljs-keyword">volatile</span> <span class="hljs-keyword">boolean</span> isStopped = <span class="hljs-keyword">false</span>;<br>  <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">run</span><span class="hljs-params">()</span> </span>&#123;<br>    <span class="hljs-keyword">super</span>.run();<br>    <span class="hljs-keyword">for</span>(<span class="hljs-keyword">int</span> i=<span class="hljs-number">0</span>;i&lt;<span class="hljs-number">100000</span>;i++) &#123;<br>      <span class="hljs-keyword">if</span>(isStopped) &#123;<br>        <span class="hljs-keyword">return</span>;<br>      &#125;<br>    &#125;<br>  &#125;<br>&#125;<br><br>中断通知：<br><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">booleanFlag</span><span class="hljs-params">()</span> </span>&#123;<br>  InterruptableThread thread = <span class="hljs-keyword">new</span> InterruptableThread();<br>  thread.start();<br>  ...<br>  thread.isStopped = <span class="hljs-keyword">true</span>;<br>  ...<br>&#125;<br></code></pre></td></tr></table></figure></li>
+<li><p>interrupt与boolean标志位对比</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>interrupt</th>
+<th>boolean</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>系统方法(sleep)</td>
+<td>是</td>
+<td>否</td>
+</tr>
+<tr>
+<td>使用JNI</td>
+<td>是</td>
+<td>否</td>
+</tr>
+<tr>
+<td>加锁</td>
+<td>是</td>
+<td>否</td>
+</tr>
+<tr>
+<td>触发方式</td>
+<td>抛异常</td>
+<td>布尔值判断，也可抛异常</td>
+</tr>
+</tbody></table>
+<ul>
+<li>需要支持系统方法时用中断（功能性）</li>
+<li>其他情况用boolean标志位（性能）</li>
+</ul>
+</li>
+</ul>
+<h4 id="三、题目结论："><a href="#三、题目结论：" class="headerlink" title="三、题目结论："></a>三、题目结论：</h4><ul>
+<li>为什么线程不应该被直接stop？因为涉及到资源清理的问题，可能会给其它线程留下烂摊子。</li>
+<li>线程内置中断机制的使用与原理：通过volatile、boolean标志位通知线程停止</li>
+</ul>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/%E9%9D%A2%E8%AF%95/">面试</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2021/04/26/%E9%9D%A2%E8%AF%95%E9%A2%98%E5%85%AD%EF%BC%9AActivity%E7%9A%84onActivityResult%E4%BD%BF%E7%94%A8%E8%B5%B7%E6%9D%A5%E9%9D%9E%E5%B8%B8%E9%BA%BB%E7%83%A6%EF%BC%8C%E4%B8%BA%E4%BB%80%E4%B9%88%E4%B8%8D%E8%AE%BE%E8%AE%A1%E6%88%90%E5%9B%9E%E8%B0%83%EF%BC%9F/">
+                        <span class="hidden-mobile">面试题六：Activity的onActivityResult使用起来非常麻烦，为什么不设计成回调？</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/debouncer.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/tocbot@4.12.0/dist/tocbot.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4.3.0/anchor.min.js" ></script>
+
+
+
+  <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2.0.6/dist/clipboard.min.js" ></script>
+
+
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2.0.11/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+      typing(title)
+      
+    })(window, document);
+  </script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+  <script>
+    (function () {
+      var path = "/local-search.xml";
+      $('#local-search-input').on('click', function() {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      });
+      $('#modalSearch').on('shown.bs.modal', function() {
+        $('#local-search-input').focus();
+      });
+    })()
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>
