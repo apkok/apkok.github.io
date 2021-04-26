@@ -185,7 +185,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      13k 字
+      11.8k 字
     </span>
   
 
@@ -195,7 +195,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      153
+      139
        分钟
     </span>
   
@@ -299,7 +299,7 @@
 <p>基本信息</p>
 <p>男 | 本科 | 6年工作经验 | 长沙</p>
 <p>TEL：19973310316</p>
-<p>Email：<a href="mailto:&#x63;&#x68;&#122;&#x68;&#103;&#x6f;&#x6f;&#64;&#x31;&#x36;&#x33;&#46;&#99;&#x6f;&#109;">&#x63;&#x68;&#122;&#x68;&#103;&#x6f;&#x6f;&#64;&#x31;&#x36;&#x33;&#46;&#99;&#x6f;&#109;</a></p>
+<p>Email：<a href="mailto:&#99;&#104;&#x7a;&#104;&#103;&#x6f;&#111;&#x40;&#x31;&#x36;&#x33;&#x2e;&#99;&#x6f;&#109;">&#99;&#104;&#x7a;&#104;&#103;&#x6f;&#111;&#x40;&#x31;&#x36;&#x33;&#x2e;&#99;&#x6f;&#109;</a></p>
 <p>期望岗位：Android工程师</p>
 <p>期望工作城市：长沙</p>
 <p>项目经历</p>
@@ -323,66 +323,10 @@
 <li>要体现业务背景、不要堆积项目细节</li>
 <li>要明确项目成果、不要陈述项目过程</li>
 </ul>
+<p><strong>推荐两本书：Java虚拟机规范、Java语言规范</strong></p>
 <p>八、面试题</p>
 <ul>
-<li><p>零、Java的char是两个字节，如何存UTF-8字符？</p>
-<p>面试官视角：这道题想考察什么？</p>
-<ul>
-<li>是否熟悉Java char和字符串（初级）</li>
-<li>是否了解字符的映射和存储细节（中级）</li>
-<li>是否能触类旁通，横向对比其他语言（高级）</li>
-</ul>
-<p>题目剖析：</p>
-<p>1、分别占多少字节？</p>
-<p>char可以存储两个字节，UTF-8可以存储一到三个字节</p>
-<p>2、和Unicode什么关系？</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">char</span> u8Test = <span class="hljs-string">&quot;庆&quot;</span>;<br><br>Integer.toHexString(u8Test);<br><br><span class="hljs-comment">// 打印出来是：0x5e 0x86两个字节，这两个字节就是Unicode码点，所以Unicode其实就是字符集</span><br><span class="hljs-comment">// ASCII码也是字符集，ASCII码与Unicode两者是兼容关系</span><br><span class="hljs-comment">// 字符集的作用是：完成字符到整数的映射</span><br><span class="hljs-comment">// 字符集不是编码，UTF-8是编码</span><br></code></pre></td></tr></table></figure>
-
-<p>3、如何存储字符？</p>
-<p>一个字符（如笑脸）是两个字节（0xd83d，0xde00），这两个字节其实就是字符集（Unicode、ASCII码）码点，如果通过UTF-8编码，会转换成byte类型，也就是四个字节（11110000，10011111，10011000，10000000），但在Java char里面，会通过UTF-16进行编码，转换成byte类型对应的四个字节（11011000（d8），00111101（3d），11011110（de），00000000（00）），然后通过计算器存储（比如序列化或磁盘），其实无所谓存不存的，因为在Java char里面，存储的是UTF-16的编码，跟UTF-8没有关系。</p>
-<p>Tip：UTF-8与UTF-16的区别是：UTF-8最小的单位是一个字节，UTF-16最小的单位是两个字节</p>
-<p>（如果字符是一个A，它对应的是65，用ASCII码7个bit来表示，但在UTF-16里面也是需要两个字节的）</p>
-<p>4、字符串长度</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs java">java:<br>String emoji = “笑脸”;<br>System.out.println(emoji.length()); <span class="hljs-comment">// 长度为：2</span><br><br><span class="hljs-comment">// jdk9对Latin字符的存储空间做了优化，但字符串长度不等于字符数</span><br><br>python:<br>emoji = u<span class="hljs-string">&quot;笑脸&quot;</span><br>print(len(emoji)) <span class="hljs-comment">// 长度为：1</span><br><br><span class="hljs-comment">// 这一点python就做的很好</span><br></code></pre></td></tr></table></figure>
-
-<p>题目结论：</p>
-<ul>
-<li>Java char 不存UTF-8的字节，而是UTF-16</li>
-<li>Unicode通用字符占两个字节，例如“中”</li>
-<li>Unicode扩展字符集需要用一对char来表示，例如“笑脸”</li>
-<li>Unicode是字符集，不是编码，作用类似于ASCII码</li>
-<li>Java String的length不是字符数，而是char的个数</li>
-</ul>
-</li>
 <li><p>一、Java String可以有多长？</p>
-<p>面试官视角：这道题想考察什么？</p>
-<ul>
-<li>是否对字符串编解码有深入了解</li>
-<li>是否对字符串在内存当中的存储形式有深入了解</li>
-<li>是否对Java虚拟机字节码有足够的了解</li>
-<li>是否对Java虚拟机指令有一定的认识</li>
-</ul>
-<p>题目剖析：</p>
-<p>1、字符串有多长是指字符数还是字节数？</p>
-<p>2、字符串有几种存在形式？</p>
-<p>3、字符串的不同形式受到何种限制？</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs java">String longString = <span class="hljs-string">&quot;aaa ... aaa&quot;</span>; <span class="hljs-comment">// 存储在栈里，开辟空间小</span><br><span class="hljs-comment">// 长度 &lt;= 65535，字符串在字节码（*.class）里，是UTF-8的结构存储的</span><br><span class="hljs-comment">// Latin字符编译成字节码，是以MUTF-8(Modified UTF-8)编码的形式存储到字节码（*.class）中</span><br><span class="hljs-comment">// 在Java编译器：当字符串长度达到65535时，会报错，这是因为在源码（Gen.java）中，((String)constValue).length() &lt; Pool.Max_STRING_LENGTH，而不是 &lt;= 或 &gt;</span><br><span class="hljs-comment">// 在Kotlin编译器中：当字符串长度达到65535时，不会报错，因为在源码中，是 &gt;</span><br><span class="hljs-comment">// 总结：（存在栈上面的String）</span><br>	<span class="hljs-comment">// 1、受字节码限制，字符串最终的MUTF-8字节数不超过65535</span><br>	<span class="hljs-comment">// 2、Latin字符，受Javac代码限制，最多65534个</span><br>	<span class="hljs-comment">// 3、非Latin字符最终对应字节个数差异较大，最多字节个数是65535</span><br>	<span class="hljs-comment">// 4、如果运行时方法区设置较小，也会受到方法区大小的限制</span><br><br><span class="hljs-keyword">byte</span>[] bytes = loadFromFile(<span class="hljs-keyword">new</span> File(<span class="hljs-string">&quot;superLongText.txt&quot;</span>));<br>String superLongString = <span class="hljs-keyword">new</span> String(bytes); <span class="hljs-comment">//存储在堆里，开辟空间大</span><br><span class="hljs-comment">// new String后背是char value[]数组，这个数组受到虚拟机指令（newarrary[int]）的限制，而newarrary[int]数组理论最大个数为Integer.MAX_VALUE</span><br><span class="hljs-comment">// 真的就是Integer.MAX_VALUE，这么大吗？不一定，因为ArrayList.java源码中的常量：MAX_ARRAY_SIZE = Integer.MAX_VALUE - 8，也就是说实际上会小于Integer.MAX_VALUE</span><br><br><span class="hljs-comment">// 总结：（存在堆上面的String）</span><br>	<span class="hljs-comment">// 1、受虚拟机指令限制，字符数理论上限为Integer.MAX_VALUE</span><br>	<span class="hljs-comment">// 2、受虚拟机实现限制，实际上限可能会小于Integer.MAX_VALUE</span><br>	<span class="hljs-comment">// 3、如果堆内存较小，也会受到堆内存的限制</span><br></code></pre></td></tr></table></figure>
-
-<p>题目结论：</p>
-<ul>
-<li>Java String字面量形式<ul>
-<li>字节码中CONSTANT_Utf8_info的限制</li>
-<li>Javac源码逻辑的限制</li>
-<li>方法区大小的限制</li>
-</ul>
-</li>
-<li>Java String运行时创建在堆上的形式<ul>
-<li>Java虚拟机指令newarray的限制</li>
-<li>Java虚拟机堆内存大小的限制</li>
-</ul>
-</li>
-</ul>
-<p><strong>推荐两本书：Java虚拟机规范、Java语言规范</strong></p>
 </li>
 <li><p>二、Java的匿名内部类有哪些限制？</p>
 <p>面试官视角：这道题想考察什么？</p>
