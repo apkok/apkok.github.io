@@ -195,7 +195,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      14
+      15
        分钟
     </span>
   
@@ -247,14 +247,14 @@
 <p>首先看看CPU架构的指令兼容性，在Android开发过程中，大概能遇到的CPU架构如下所示：</p>
 <p>【mips64、mips】、【x86_64、x86】、【arm64-v8a、armeabi-v7a、armeabi】，最常见的CPU架构是【arm64-v8a、armeabi-v7a、armeabi】，最不常见的就是【mips64、mips】，而且这两个CPU架构已经废弃了。</p>
 <p>接下来我们看看它们的兼容性如何？</p>
-<p>1、mips其实是可以放在mips64机器上跑的。</p>
-<p>2、x86其实是可以在x86_64机器上跑的。</p>
-<p>3、armeabi-v7a其实是可以在arm64-v8a机器上跑的。</p>
-<p>4、armeabi其实是可以在x86_64、x86、arm64-v8a、armeabi-v7a机器上跑的。</p>
+<p>1、mips其实是可以放在mips64机器上跑的，所以mips64兼容mips。</p>
+<p>2、x86其实是可以在x86_64机器上跑的，所以x86_64兼容x86。</p>
+<p>3、armeabi-v7a其实是可以在arm64-v8a机器上跑的，所以arm64_v8a兼容armeabi-v7a。</p>
+<p>4、armeabi其实是可以在x86_64、x86、arm64-v8a、armeabi-v7a机器上跑的，所以x86_64、x86、arm64-v8a、armeabi-v7a兼容armeabi。</p>
 <p>综合所述，发现armeabi的兼容性最好！！！</p>
 <p>最后举个例子：</p>
 <p>项目中的libs目录下有以下so库：armeabi（libmath.so、libui.so）、armeabi-v7a（libmath.so、libui.so）、arm64-v8a（libmath.so、libui.so），那么在arm64-v8a的机器上Native库如何加载呢？</p>
-<p>它会优先选择当前CPU对应的CPU架构目录下的so库，假设如果arm64-v8a架构的so库里面没有libui.so了，那么会发生什么情况呢？它还是会去arm64-v8a架构的so库里面找，但so库里没有libui.so，那么加载就会失败，那刚刚也说了armeabi和armeabi-v7a本身就兼容arm64-v8a，那为什么不去加载它们呢？这是因为CPU加载so库的时候就这么规定的，所以要提供so库就一定要提供一全套，要么就一个都不要提供，这样CPU就会去找它所兼容的so库。</p>
+<p>它会优先选择当前CPU对应的CPU架构目录下的so库，也就是会加载arm64-v8a（libmath.so、libui.so）目录下的so库，假设如果arm64-v8a架构的so库里面没有libui.so了，那么会发生什么问题呢？它还是会去arm64-v8a架构的so库里面找，但发现so库里没有libui.so，那么加载就会失败，那刚刚也说了armeabi和armeabi-v7a本身就兼容arm64-v8a，那为什么不去加载它们呢？这是因为CPU加载so库的时候就这么规定的，所以要提供so库就一定要提供一全套，要么就一个都不要提供，这样CPU就会去找它所兼容的so库。</p>
 <p>兼容模式运行的一些问题：</p>
 <p>1、兼容模式运行的Native库无法获得最优性能（所以x86的电脑上运行arm的虚拟机会很慢！）</p>
 <p>2、兼容模式容易出现一些难以排查的内存问题</p>
@@ -262,11 +262,11 @@
 </blockquote>
 <p>3、so库太多如何优化Apk体积</p>
 <ul>
-<li><p>为App提供不同的架构的Native库</p>
+<li><p>为App提供不同的CPU架构的Native库</p>
 <blockquote>
-<p>实际开发过程中，我们不可能提供所有CPU架构的so库，那就要考虑兼容，兼容性最好的当然就是armeabi了，那是不是我们就只需要提供这一套了呢？如果在性能不敏感且无运行时异常的情况下可以这么干。但目前市场上大部分的机器的CPU架构都已经是armeabi-v7a和arm64-v8a了，所以这个时候提供一套兼容性最好的so库就是armeabi-v7a了，也就足够了，所以我们要结合目标用户群体提供合适的架构。</p>
-<p>还有一个方案就是，我们只提供一个so库目录，比如armeabi-v7a，把所有的so库都扔到这一个目录里面，这样一来里面也可以提供arm64-v8a的so库等，这样的话，我们就可以动态根据当前的CPU架构去选择加载一些特定的so库，微信就是这么干的。</p>
-<p>那到底如何去选择方案去提供so库呢？</p>
+<p>实际开发过程中，我们不可能提供所有CPU架构的so库，那就要考虑兼容，兼容性最好的当然就是armeabi了，那是不是我们就只需要提供这一套了呢？如果在性能不敏感且无运行时异常的情况下可以这么干。但目前市场上大部分的机器的CPU架构都已经是armeabi-v7a和arm64-v8a了，所以这个时候提供一套兼容性最好的so库就是armeabi-v7a了，所以我们要结合目标用户群体提供合适的架构。</p>
+<p>还有一个方案就是，我们只提供一个CPU架构目录，比如armeabi-v7a，把所需要的so库都扔到这一个目录里面，这样一来里面也可以提供arm64-v8a的so库等，这样的话，我们就可以动态根据当前的CPU架构去选择加载一些特定的so库，微信就是这么干的。</p>
+<p>那到底选择那种方案去提供so库呢？</p>
 <p>最好的办法就是通过线上监控问题，然后针对性提供Native库。</p>
 </blockquote>
 </li>
@@ -332,6 +332,12 @@
                 <div class="post-prevnext">
                   <article class="post-prev col-6">
                     
+                    
+                      <a href="/2021/04/27/%E9%9D%A2%E8%AF%95%E9%A2%98%E5%8D%81%E4%B8%89%EF%BC%9AJava-Native%E6%96%B9%E6%B3%95%E4%B8%8ENative%E5%87%BD%E6%95%B0%E6%98%AF%E6%80%8E%E4%B9%88%E7%BB%91%E5%AE%9A%E7%9A%84%EF%BC%9F/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">面试题十三：Java Native方法与Native函数是怎么绑定的？</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
                     
                   </article>
                   <article class="post-next col-6">
