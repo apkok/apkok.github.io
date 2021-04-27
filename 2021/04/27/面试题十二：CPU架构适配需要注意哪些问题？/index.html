@@ -18,7 +18,7 @@
   <meta name="author" content="Apkok">
   <meta name="keywords" content="">
   
-  <title>面试技巧 - 星海渤文</title>
+  <title>面试题十二：CPU架构适配需要注意哪些问题？ - 星海渤文</title>
 
   <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" />
 
@@ -158,12 +158,12 @@
 </nav>
 
     <div class="banner" id="banner" parallax=true
-         style="background: url('https://rmt.ladydaily.com/fetch/fluid/storage/bg/dojm2h.png?w=1920&q=100&fmt=webp') no-repeat center center;
+         style="background: url('https://img9.51tietu.net/pic/2019-091408/zfku0j3yjkizfku0j3yjki.jpg') no-repeat center center;
            background-size: cover;">
       <div class="full-bg-img">
         <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
           <div class="page-header text-center fade-in-up">
-            <span class="h2" id="subtitle" title="面试技巧">
+            <span class="h2" id="subtitle" title="面试题十二：CPU架构适配需要注意哪些问题？">
               
             </span>
 
@@ -173,8 +173,8 @@
   
     <span class="post-meta">
       <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-      <time datetime="2021-04-18 22:21" pubdate>
-        2021年4月18日 晚上
+      <time datetime="2021-04-27 09:53" pubdate>
+        2021年4月27日 上午
       </time>
     </span>
   
@@ -185,7 +185,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      879 字
+      1.3k 字
     </span>
   
 
@@ -195,7 +195,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      9
+      14
        分钟
     </span>
   
@@ -225,105 +225,87 @@
         <div class="py-5" id="board">
           <article class="post-content mx-auto">
             <!-- SEO header -->
-            <h1 style="display: none">面试技巧</h1>
+            <h1 style="display: none">面试题十二：CPU架构适配需要注意哪些问题？</h1>
             
             <div class="markdown-body">
-              <p>一、梳理自身的技能</p>
-<ul>
-<li><p>编程语言（Java）功底</p>
-<ul>
-<li>你熟悉的语言有哪些亮点特性？</li>
-<li>你能运用这些特性写什么框架？</li>
-</ul>
+              <h3 id="CPU架构适配需要注意哪些问题？"><a href="#CPU架构适配需要注意哪些问题？" class="headerlink" title="CPU架构适配需要注意哪些问题？"></a>CPU架构适配需要注意哪些问题？</h3><h4 id="一、面试官视角：这道题想考察什么？"><a href="#一、面试官视角：这道题想考察什么？" class="headerlink" title="一、面试官视角：这道题想考察什么？"></a>一、面试官视角：这道题想考察什么？</h4><ul>
+<li><p>是否有Native开发经验</p>
 </li>
-<li><p>Android系统原理</p>
-<ul>
-<li>程序是怎么运行的？</li>
-<li>窗口是怎么显示的？</li>
-<li>声音是怎么播放的？</li>
-</ul>
+<li><p>是否关注过CPU架构适配</p>
 </li>
-<li><p>项目经验</p>
-<ul>
-<li>有哪些难点如何突破的？</li>
-<li>有哪些你失败之处？</li>
-</ul>
+<li><p>是否有过含Native代码的SDK开发的经历（包括如何为他人提供so库）</p>
 </li>
-<li><p>架构设计</p>
-<ul>
-<li>为什么选这个方案？</li>
-<li>如何进行模块边界的划分？</li>
-<li>如何实现模块解耦？</li>
-</ul>
+<li><p>是否针对CPU架构适配做过包体积优化</p>
+<blockquote>
+<p>涉及包含哪些CPU架构的so库，如果包含得多了话，那么包体积肯定很大，那针对这种情况有没有过类似的优化。</p>
+</blockquote>
 </li>
 </ul>
-<p>二、明确自己的目标</p>
+<h4 id="二、题目剖析"><a href="#二、题目剖析" class="headerlink" title="二、题目剖析"></a>二、题目剖析</h4><p>1、Native开发才会关注CPU架构</p>
+<p>2、不同CPU架构之间的兼容性如何</p>
+<blockquote>
+<p>首先看看CPU架构的指令兼容性，在Android开发过程中，大概能遇到的CPU架构如下所示：</p>
+<p>【mips64、mips】、【x86_64、x86】、【arm64-v8a、armeabi-v7a、armeabi】，最常见的CPU架构是【arm64-v8a、armeabi-v7a、armeabi】，最不常见的就是【mips64、mips】，而且这两个CPU架构已经废弃了。</p>
+<p>接下来我们看看它们的兼容性如何？</p>
+<p>1、mips其实是可以放在mips64机器上跑的。</p>
+<p>2、x86其实是可以在x86_64机器上跑的。</p>
+<p>3、armeabi-v7a其实是可以在arm64-v8a机器上跑的。</p>
+<p>4、armeabi其实是可以在x86_64、x86、arm64-v8a、armeabi-v7a机器上跑的。</p>
+<p>综合所述，发现armeabi的兼容性最好！！！</p>
+<p>最后举个例子：</p>
+<p>项目中的libs目录下有以下so库：armeabi（libmath.so、libui.so）、armeabi-v7a（libmath.so、libui.so）、arm64-v8a（libmath.so、libui.so），那么在arm64-v8a的机器上Native库如何加载呢？</p>
+<p>它会优先选择当前CPU对应的CPU架构目录下的so库，假设如果arm64-v8a架构的so库里面没有libui.so了，那么会发生什么情况呢？它还是会去arm64-v8a架构的so库里面找，但so库里没有libui.so，那么加载就会失败，那刚刚也说了armeabi和armeabi-v7a本身就兼容arm64-v8a，那为什么不去加载它们呢？这是因为CPU加载so库的时候就这么规定的，所以要提供so库就一定要提供一全套，要么就一个都不要提供，这样CPU就会去找它所兼容的so库。</p>
+<p>兼容模式运行的一些问题：</p>
+<p>1、兼容模式运行的Native库无法获得最优性能（所以x86的电脑上运行arm的虚拟机会很慢！）</p>
+<p>2、兼容模式容易出现一些难以排查的内存问题</p>
+<p>3、系统优先加载对应架构目录下的so库</p>
+</blockquote>
+<p>3、so库太多如何优化Apk体积</p>
 <ul>
-<li>了解市场需求</li>
-<li>明确自身水平</li>
-<li>确定面试重点</li>
-</ul>
-<p>三、面试过程中的STAR法则（根据STAR法则去回答问题）</p>
-<ul>
-<li><p>情境（Situation）：所处什么情况？</p>
+<li><p>为App提供不同的架构的Native库</p>
+<blockquote>
+<p>实际开发过程中，我们不可能提供所有CPU架构的so库，那就要考虑兼容，兼容性最好的当然就是armeabi了，那是不是我们就只需要提供这一套了呢？如果在性能不敏感且无运行时异常的情况下可以这么干。但目前市场上大部分的机器的CPU架构都已经是armeabi-v7a和arm64-v8a了，所以这个时候提供一套兼容性最好的so库就是armeabi-v7a了，也就足够了，所以我们要结合目标用户群体提供合适的架构。</p>
+<p>还有一个方案就是，我们只提供一个so库目录，比如armeabi-v7a，把所有的so库都扔到这一个目录里面，这样一来里面也可以提供arm64-v8a的so库等，这样的话，我们就可以动态根据当前的CPU架构去选择加载一些特定的so库，微信就是这么干的。</p>
+<p>那到底如何去选择方案去提供so库呢？</p>
+<p>最好的办法就是通过线上监控问题，然后针对性提供Native库。</p>
+</blockquote>
 </li>
-<li><p>任务（Task）：接到了什么任务？</p>
+<li><p>动态加载Native库</p>
+<blockquote>
+<p>把非启动加载的库放到云端（CSD）上， 然后通过开关让用户选择是否需要加载，需要的话就从云端下发，不需要的话就拉到。</p>
+</blockquote>
 </li>
-<li><p>行动（Action）：你怎么做的？</p>
+<li><p>优化so体积</p>
 <ul>
-<li>你怎么分析思考的？</li>
-<li>选择什么方案？为什么？</li>
-<li>你怎么进行方案落实的？</li>
-<li>你怎么协调团队推进项目的？</li>
-<li>你怎么监控结果的？</li>
-</ul>
-</li>
-<li><p>结果（Result）：结果如何？</p>
-<ul>
-<li>你的方案效果如何？</li>
-<li>收益是什么？</li>
-<li>具体数值是什么？</li>
-<li>不要“大量”、“很多”这样的词汇</li>
+<li>默认隐藏所以符合，只公开必要的（-fvisibility=hidden）</li>
+<li>禁用C++ Exception&amp;RTTI（-fno-exception -fno-rtti）</li>
+<li>不要使用iostream，应优先使用Android Log</li>
+<li>使用gc-sections去除无用代码（类似于Java的混淆）<ul>
+<li>LOCAL_CFLAGS += -ffunction-sections -fdata-sections</li>
+<li>LOCAL_LDFLAGS += -Wl,–gc-sections</li>
 </ul>
 </li>
 </ul>
-<p>四、准备合适的简历</p>
-<ul>
-<li>基本信息简明扼要</li>
-<li>求职意向清晰明了</li>
-<li>根据JD（面试官意图）定制简历</li>
-<li>拿出你的项目成果</li>
-<li>避免空洞的自我评价</li>
+</li>
+<li><p>构建时分包（官方提供）</p>
+<blockquote>
+<p>根据CPU架构进行分包，每一个包里面只包含一种CPU架构，然后借助应用市场按CPU架构分发安装包。</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs java">splits &#123;<br>    abi &#123;<br>        enable <span class="hljs-keyword">true</span><br>        reset()<br>        include <span class="hljs-string">&quot;armeabi-v7a&quot;</span>、<span class="hljs-string">&quot;arm64-v8a&quot;</span>、<span class="hljs-string">&quot;x86&quot;</span>、<span class="hljs-string">&quot;x86_64&quot;</span><br>        universalApk <span class="hljs-keyword">true</span><br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure></li>
 </ul>
-<p>五、简历模版</p>
-<p>基本信息</p>
-<p>男 | 本科 | 6年工作经验 | 长沙</p>
-<p>TEL：19973310316</p>
-<p>Email：<a href="mailto:&#99;&#x68;&#122;&#x68;&#103;&#111;&#111;&#x40;&#x31;&#x36;&#x33;&#46;&#x63;&#111;&#109;">&#99;&#x68;&#122;&#x68;&#103;&#111;&#111;&#x40;&#x31;&#x36;&#x33;&#46;&#x63;&#111;&#109;</a></p>
-<p>期望岗位：Android工程师</p>
-<p>期望工作城市：长沙</p>
-<p>项目经历</p>
-<p>xxxx年x月-xxxx年x月          XXXX有限公司</p>
-<p>项目：XXX客户端</p>
-<p>介绍：我主要负责部分页面的开发，尝试对页面过度绘制进行优化，优化后页面平均绘制耗时从20ms降到3ms（数值瞎写的）；活动、频道等功能的架构优化，对这些模块彻底解耦，降低维护成本约30%（工作量排期、做需求的时间估算出来的）；评论模块组件化通用化，在其他三个项目中得到复用，每个项目节省10人天的工作量。</p>
-<p>（职责 - 背景 - 任务 - 行动 - 成果）</p>
-<p>期间独立负责XX地图SDK的开发维护（职责），期间考虑到XXX原因导致项目可维护性较差（背景），主动进行一次彻底重构和优化（任务），将SDK接口与业界对齐（行动），包体积下降20%，方法数减少35%，（结果），删除冗余设计（行动），代码行数由x万行精简到y万行（结果），新增功能若干。此后也针对不同合作伙伴的定制发版碎片化问题进行统一梳理，开发构建工具，实现构建零人工，每次发版节省人力n人天。</p>
-<p>自我评价</p>
-<p>注重效率：习惯编写各种工具类、组件等提升工作效率</p>
-<p>乐于分享：经常在团队内部组织技术研讨和交流</p>
-<p>六、简历的关键词</p>
+<p>4、SDK开发者应当提供哪些so库</p>
 <ul>
-<li>通过简历内容提取三个左右的关键词</li>
-<li>关键词要与招聘需求匹配</li>
+<li>尽量不在Native层开发，降低问题跟踪维护成本</li>
+<li>尽量优化Native库的体积，降低开发者的使用成本</li>
+<li>必须提供完整的CPU架构依赖</li>
 </ul>
-<p>七、简历的“四要、四不要”</p>
-<ul>
-<li>要聚焦核心技能（不要写工具的使用，如git、svn等）、不要到处熟练精通</li>
-<li>要突出技术亮点、不要罗列开源框架</li>
-<li>要体现业务背景、不要堆积项目细节</li>
-<li>要明确项目成果、不要陈述项目过程</li>
+<h4 id="三、题目结论"><a href="#三、题目结论" class="headerlink" title="三、题目结论"></a>三、题目结论</h4><ul>
+<li>注意CPU架构指令兼容关系，以及兼容模式下的问题</li>
+<li>注意合理提供Native库，在性能与体积上取舍</li>
+<li>通过代码编写和编译的手段缩减Native库的体积</li>
+<li>通过动态下发的方式减小安装包的体积</li>
+<li>SDK开发相比App开发者应当多关注的一些问题</li>
 </ul>
-<p><strong>推荐两本书：Java虚拟机规范、Java语言规范</strong></p>
 
             </div>
             <hr>
@@ -351,18 +333,12 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2021/04/26/%E9%9D%A2%E8%AF%95%E9%A2%98%E4%B8%80%EF%BC%9AJava%E7%9A%84char%E6%98%AF%E4%B8%A4%E4%B8%AA%E5%AD%97%E8%8A%82%EF%BC%8C%E5%A6%82%E4%BD%95%E5%AD%98UTF-8%E5%AD%97%E7%AC%A6%EF%BC%9F/">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">面试题一：Java的char是两个字节，如何存UTF-8字符？</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2021/04/16/Hexo%E4%BB%8E%E5%85%A5%E9%97%A8%E5%88%B0%E6%94%BE%E5%BC%83/">
-                        <span class="hidden-mobile">Hexo从入门到放弃</span>
+                      <a href="/2021/04/26/%E9%9D%A2%E8%AF%95%E9%A2%98%E5%8D%81%E4%B8%80%EF%BC%9A%E5%A6%82%E4%BD%95%E5%9C%A8Android%E4%B8%AD%E5%86%99%E5%87%BA%E4%BC%98%E9%9B%85%E7%9A%84%E5%BC%82%E6%AD%A5%E4%BB%A3%E7%A0%81%EF%BC%9F/">
+                        <span class="hidden-mobile">面试题十一：如何在Android中写出优雅的异步代码？</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
