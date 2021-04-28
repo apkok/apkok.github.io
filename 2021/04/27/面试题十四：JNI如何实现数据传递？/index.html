@@ -18,7 +18,7 @@
   <meta name="author" content="Apkok">
   <meta name="keywords" content="">
   
-  <title>面试题十四：JNI如何实现数据传递？ - 星海渤文</title>
+  <title>面试题十四：JNI如何实现数据传递？（待整理） - 星海渤文</title>
 
   <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" />
 
@@ -163,7 +163,7 @@
       <div class="full-bg-img">
         <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
           <div class="page-header text-center fade-in-up">
-            <span class="h2" id="subtitle" title="面试题十四：JNI如何实现数据传递？">
+            <span class="h2" id="subtitle" title="面试题十四：JNI如何实现数据传递？（待整理）">
               
             </span>
 
@@ -185,7 +185,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      9 字
+      1k 字
     </span>
   
 
@@ -195,7 +195,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      1
+      11
        分钟
     </span>
   
@@ -225,10 +225,74 @@
         <div class="py-5" id="board">
           <article class="post-content mx-auto">
             <!-- SEO header -->
-            <h1 style="display: none">面试题十四：JNI如何实现数据传递？</h1>
+            <h1 style="display: none">面试题十四：JNI如何实现数据传递？（待整理）</h1>
             
             <div class="markdown-body">
-              <h3 id="JNI如何实现数据传递？"><a href="#JNI如何实现数据传递？" class="headerlink" title="JNI如何实现数据传递？"></a>JNI如何实现数据传递？</h3>
+              <h3 id="JNI如何实现数据传递？"><a href="#JNI如何实现数据传递？" class="headerlink" title="JNI如何实现数据传递？"></a>JNI如何实现数据传递？</h3><h4 id="一、面试官视角：这道题想考察什么？"><a href="#一、面试官视角：这道题想考察什么？" class="headerlink" title="一、面试官视角：这道题想考察什么？"></a>一、面试官视角：这道题想考察什么？</h4><ul>
+<li>是否有Native开发经验</li>
+<li>是否对JNI数据传递中的细节有认识</li>
+<li>是否能够合理的设计JNI的界限</li>
+</ul>
+<h4 id="二、题目剖析"><a href="#二、题目剖析" class="headerlink" title="二、题目剖析"></a>二、题目剖析</h4><p>1、传递什么数据？</p>
+<p>2、如何实现内存回收？</p>
+<p>3、性能如何？</p>
+<p>4、结合实例来分析更有效</p>
+<p>举例一：在Java层有个Bitmap（<code>Bitmap.java</code>）类，在Native层也有一个类（<code>Bitmap.h/cpp</code>）与之对应，那么这两者如何关联起来呢？</p>
+<blockquote>
+<p>通过在Java层<code>Bitmap.java</code>持有的<code>private final long mNativePtr</code>（指针），这个<code>mNativePtr</code>就是Native层的<code>Bitmap.h/cpp</code>的指针。</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">// Java层Native方法</span><br><span class="hljs-comment">// 该方法用于压缩Bitmap到stream（流）里面。</span><br><span class="hljs-comment">// nativeBitmap是指针，对应的底层Native函数中的bitmapHandle参数，然后在底层函数中使用bitmapHandle传入到bitmap(bitmapHandle)函数中，获取到对应的底层Bitmap对象，获取到之后就可以操作底层的Bitmap了。</span><br><span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">native</span> <span class="hljs-keyword">boolean</span> <span class="hljs-title">nativeCompress</span><span class="hljs-params">(<span class="hljs-keyword">long</span> nativeBitmap, <span class="hljs-keyword">int</span> format, <span class="hljs-keyword">int</span> quality, OutputStream stream, <span class="hljs-keyword">byte</span>[] tempStorage)</span></span>;<br><br><span class="hljs-comment">// 底层Native函数</span><br><span class="hljs-function"><span class="hljs-keyword">static</span> jboolean <span class="hljs-title">Bitmap_compress</span><span class="hljs-params">(JNIEnv* env, jobject clazz, jlong bitmapHandle, jint format, jint quality, jobject jstream, jbyteArray jstorage)</span> </span>&#123;<br>    <span class="hljs-function">LocalScopeBitmap <span class="hljs-title">bitmap</span><span class="hljs-params">(bitmapHandle)</span></span>;<br>&#125;<br><br><span class="hljs-comment">// 结论：在底层有一个类，在Java层也有一个类，如果关联起来呢？通过底层的指针，这个指针在Java层就是一个长整型（long），如果你确定是32位的机器的话，给个整型（int）也可以。</span><br></code></pre></td></tr></table></figure>
+
+<p>举例二：字符串操作</p>
+<ul>
+<li><p>GetStringUTFChars/ReleaseStringUTFChars</p>
+<ul>
+<li><p>const char*</p>
+</li>
+<li><p>拷贝出Modified-UTF-8的字节流（字节码存字符串使用MUTF-8）</p>
+</li>
+<li><p>\0编码成0xC080，不会影响C字符串结尾</p>
+</li>
+<li><p>const char* GetStringUTFChars(jstring string, jboolean* isCopy)</p>
+<blockquote>
+<p>isCopy：并不是要你指定是否要拷贝，而是要你传进去一个引用，然后它会把Get之后的结果是不是拷贝的告诉你，本质上isCopy是一个返回值。</p>
+<p>在调用完<code>GetStringUTFChars</code>方法之后，<code>*isCopy == false</code>，表示没有复制，为什么？</p>
+<p>比如在Java虚拟机里面有个”HelloWorld”，那么Native函数中的<code>const char*</code>指向的就是它，假设内存GC了，GC之后一般都要进行整理，GC的算法有些就是要标记、整理和复制，这样做主要是为了减少内存碎片，让内存更加的连续，从而适应大对象的分配，但这个时候你因为要复制这个”HelloWorld”对象的话，就意味着要把这个对象锁定，为啥要锁定，因为<code>const char*</code>指针是直接指向它的，这样的话，就不能GC了，因为一旦GC，这个指针不就跑了嘛！那你就指向了一个野指针，所以这个就要看虚拟机支持不支持，有些虚拟机还真就不支持，它们倾向于复制，而不是通过指针直接指向，因为可以减少它的逻辑，让它更轻松一些，所以很多虚拟机都会返回一个<code>*isCopy == true</code>，那么这种情况就是，它帮你复制一分”HelloWorld”这块内存过来，然后指针指向的就是C层的一块内存了，跟Java虚拟机内存没有了任何关系了，Jvm GC就GC呗，无所谓！。</p>
+</blockquote>
+</li>
+</ul>
+</li>
+<li><p>GetStringChars/ReleaseStringChars</p>
+<ul>
+<li>const jchar*（Java中的两个char对应一个jchar）</li>
+<li>JNI函数自动处理字节序转换</li>
+<li>const char* GetStringChars(jstring string, jboolean* isCopy)</li>
+</ul>
+</li>
+<li><p>GetStringUTFRegion/getStringRegion</p>
+<ul>
+<li>先在C层创建足够容量的空间</li>
+<li>将字符串的某一部分复制到开辟好的空间</li>
+<li>针对性复制，少量读取时效率更优</li>
+</ul>
+</li>
+<li><p>GetStringCritical/ReleaseStringCritical</p>
+<ul>
+<li><p>调用对中间会停掉 Jvm GC</p>
+</li>
+<li><p>调用对之间不可有其他操作</p>
+</li>
+<li><p>调用对可嵌套</p>
+</li>
+<li><p>const jchar* GetStringCritical(jstring string, jboolean* isCopy)</p>
+<blockquote>
+<p>在调用完<code>GetStringCritical</code>方法之后，很容易返回一个<code>*isCopy == false</code>的情况，因为它给Java虚拟机加了把锁，阻止了Jvm GC，从而直接指向Java虚拟机内存，该方法调用时也要注意，期间不能调用其它JNI函数，不然容易出现死锁，而且用的时候尽量时间要短，用完之后马上归还（调用<code>ReleaseStringCritical</code>）。</p>
+</blockquote>
+</li>
+</ul>
+</li>
+</ul>
+<h4 id="三、题目结论"><a href="#三、题目结论" class="headerlink" title="三、题目结论"></a>三、题目结论</h4>
             </div>
             <hr>
             <div>
