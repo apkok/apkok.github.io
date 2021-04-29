@@ -185,7 +185,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      10 字
+      1.3k 字
     </span>
   
 
@@ -195,7 +195,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      1
+      14
        分钟
     </span>
   
@@ -228,7 +228,90 @@
             <h1 style="display: none">面试题十七：Activity的启动流程是怎样的？</h1>
             
             <div class="markdown-body">
-              <h3 id="Activity的启动流程是怎样的？"><a href="#Activity的启动流程是怎样的？" class="headerlink" title="Activity的启动流程是怎样的？"></a>Activity的启动流程是怎样的？</h3>
+              <h3 id="Activity的启动流程是怎样的？"><a href="#Activity的启动流程是怎样的？" class="headerlink" title="Activity的启动流程是怎样的？"></a>Activity的启动流程是怎样的？</h3><h4 id="一、面试官视角：这道题想考察什么？"><a href="#一、面试官视角：这道题想考察什么？" class="headerlink" title="一、面试官视角：这道题想考察什么？"></a>一、面试官视角：这道题想考察什么？</h4><ul>
+<li>是否熟悉Activity启动过程中与AMS（Activity Manager Service）的交互过程</li>
+<li>是否熟悉Binder通信机制</li>
+<li>是否了解插件化框架如何Hook Activity启动</li>
+<li>阐述Activity转场动画的实现原理</li>
+<li>阐述Activity的窗口显示流程</li>
+</ul>
+<h4 id="二、题目剖析"><a href="#二、题目剖析" class="headerlink" title="二、题目剖析"></a>二、题目剖析</h4><p>0、Activity跨进程启动</p>
+<blockquote>
+<p>跨进程启动流程：</p>
+<p>在【请求进程A】中调用startActivity，通过AMP启动Activity，AMP指的是AMS在通信过程中在客户端的一个代理，我们通过AMP来调用AMS一些方法来启动Activity，启动Activity的过程当中，会在【system_server进程】中解析Activity信息、处理启动参数、启动目标进程、绑定新进程，而启动目标进程是通过Zygote，直接Fork出来一个进程，在Android里面所有的进程都是通过Zygote Fork出来的，这样的话我们就可以共享到一些预加载的资源等，启动速度也会变得更快。然后通过调用ATP（ATP指的是ApplicationThread在system_server端的一个代理）的scheduleLaunchActivity，本质上是调用的ApplicationThread的方法，进而在【目标进程B】中去启动Activity。</p>
+<p>以上就是跨进程启动Activity的流程，比如通过Launcher来启动自己的进程就是这么干的，Launcher在里面调用startActivity，你点桌面icon的时候就会触发这个流程。</p>
+</blockquote>
+<p>1、Activity进程内启动</p>
+<blockquote>
+<p>在【请求进程A】中调用startActivity，通过AMP启动Activity，AMP指的是AMS在通信过程中在客户端的一个代理，我们通过AMP来调用AMS一些方法来启动Activity，启动Activity的过程当中，会在【system_server进程】中解析Activity信息、处理启动参数，然后通过ATP（ATP指的是ApplicationThread在system_server端的一个代理）的scheduleLaunchActivity，本质上是调用的ApplicationThread的方法，进而在【请求进程A】中去启动Activity。</p>
+</blockquote>
+<p>2、与AMS如何交互</p>
+<blockquote>
+<p>通过AMP，AMP指的是AMS在通信过程中在客户端的一个代理，我们通过AMP来调用AMS一些方法来启动Activity。</p>
+</blockquote>
+<p>3、Activity的参数和结果如何传递</p>
+<blockquote>
+<p>启动Activity的时候，有跨进程的调用，那么跨进程的调用是通过Binder来实现通信的，Binder本身有一个缓冲区，但这个缓冲区有大小的限制，如果你启动Activity的时候，携带数据过大的话会有问题的，而且数据必须可以序列化。</p>
+</blockquote>
+<p>4、Activity如何实例化</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs java">Instrumentation.java:<br><br><span class="hljs-function"><span class="hljs-keyword">public</span> Activity <span class="hljs-title">newActivity</span><span class="hljs-params">(ClassLoader cl, String className, Intent intent)</span> <span class="hljs-keyword">throws</span> InstantiationException, IllegalAccessException, ClassNotFoundException </span>&#123;<br>    String pkg = intent != <span class="hljs-keyword">null</span> &amp;&amp; intent.getComponent() != <span class="hljs-keyword">null</span>?intent.getComponent().getPackageName():<span class="hljs-keyword">null</span>;<br>    <span class="hljs-comment">// 实例化Activity</span><br>    <span class="hljs-keyword">return</span> getFactory(pkg).instantiateActivity(cl, className, intent);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs java">instantiate()实现:<br><br><span class="hljs-keyword">public</span> <span class="hljs-meta">@NonNull</span> <span class="hljs-function">Activity <span class="hljs-title">instantiateActivity</span><span class="hljs-params">(<span class="hljs-meta">@NonNull</span> ClassLoader cl, <span class="hljs-meta">@NonNull</span> String className, <span class="hljs-meta">@Nullable</span> Intent intent)</span> <span class="hljs-keyword">throws</span> InstantiationException, IllegalAccessException, ClassNotFoundException </span>&#123;<br>    <span class="hljs-comment">// 反射</span><br>    <span class="hljs-comment">// newInstance能够调用的话，必须要有一个默认的无参的构造方法，这就是为什么我们写Activity的时候，从来没有写过构造方法的原因，如果你写了，Activity压根就无法实例化，同时Idea也会提示你不能这么写，因为这样会导致Activity无法启动。</span><br>    <span class="hljs-keyword">return</span> (Activity)cl.loadClass(className).newInstance();<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>5、Activity、Fragment为什么不能添加有参数的构造方法？</p>
+<blockquote>
+<p>这就涉及到Activity状态保存和恢复，比如从ActivityA到ActivityB，然后又从ActivityB回到ActivityA，之前讲匿名内部类也是这种场景，其实同样的场景下还涉及到一个Activity状态如何保存和恢复的问题！状态的保存和恢复有个重要的点就是FragmentManager，它会在ActivityA被销毁的时候，也就是ActivityA要保存状态的时候，把ActivityA里面持有的Fragment保存到一个叫android:fragments这么一个key的数据里面，等到ActivityA要恢复的时候再把它恢复出来，那Activity和Fragment如何恢复呢？还不就是通过上面所说的类似调用newInstance()方法进行恢复，要想成功调用newInstance()方法，就必须要有一个默认的无参的构造方法，所以这就是为什么不能添加有参数的构造方法的原因所在，就算你写了有参的构造方法，也要提供一个默认的无参的构造方法。</p>
+</blockquote>
+<p>5、Activity生命周期如何流转</p>
+<p>ActivityThread - handleLaunchActivity：</p>
+<ul>
+<li><p>newActivity</p>
+</li>
+<li><p>activity - attach</p>
+</li>
+<li><p>activity - create</p>
+</li>
+<li><p>activity - start</p>
+</li>
+<li><p>activity - restoreState</p>
+</li>
+<li><p>activity - postCreate</p>
+</li>
+<li><p>activity - resume</p>
+</li>
+<li><p>activity - makeVisible</p>
+</li>
+</ul>
+<p>6、Activity的窗口如何展示</p>
+<p>ActivityThread - handleLaunchActivity：</p>
+<ul>
+<li><p>newActivity</p>
+</li>
+<li><p>activity - attach（调用createPhoneWindow，创建窗口）</p>
+</li>
+<li><p>activity - create</p>
+</li>
+<li><p>activity - start</p>
+</li>
+<li><p>activity - restoreState</p>
+</li>
+<li><p>activity - postCreate</p>
+</li>
+<li><p>activity - resume</p>
+<blockquote>
+<p>从create()到resume()，才会去触发DecorView的创建（期间包括addContentView、setContentView、getDecorView）</p>
+</blockquote>
+</li>
+<li><p>activity - makeVisible</p>
+<blockquote>
+<p>makeVisible()才会显示DecorView，显示的内容包括status bar、action bar、content view；所以在resume()或之前，想获取Activity View的大小的话，你会发现它们返回的始终是0，因为DecorView还没有显示丫！但如果你在resume()使用handler直接调用post，让它放到下一帧去获取view的大小就可以获取到了，因为在resume()之后马上就把DecorView给显示出来了。</p>
+</blockquote>
+</li>
+</ul>
+<p>7、Activity转场动画的实现机制</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs java">ExitTransitionCoordinator:<br><br><span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">void</span> <span class="hljs-title">startExitTransition</span><span class="hljs-params">()</span> </span>&#123;<br>    Transition transition = getExitTransition();<br>    ViewGroup docorView = getDecor();<br>    <br>&#125;<br></code></pre></td></tr></table></figure>
+
+
             </div>
             <hr>
             <div>
