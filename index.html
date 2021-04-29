@@ -180,15 +180,55 @@
     
     
       <div class="col-12 col-md-4 m-auto index-img">
-        <a href="/2021/04/29/%E9%9D%A2%E8%AF%95%E9%A2%98%E5%8D%81%E4%BA%94%EF%BC%9A%E5%A6%82%E4%BD%95%E5%85%A8%E5%B1%80%E6%8D%95%E8%8E%B7Native%E5%BC%82%E5%B8%B8%EF%BC%9F/" target="_self">
-          <img src="https://img9.51tietu.net/pic/2019-091408/ndlx2laz2zkndlx2laz2zk.jpg" srcset="/img/loading.gif" lazyload alt="面试题十五：如何全局捕获Native异常？">
+        <a href="/2021/04/29/%E9%9D%A2%E8%AF%95%E9%A2%98%E5%8D%81%E5%85%AD%EF%BC%9A%E5%8F%AA%E6%9C%89C%E3%80%81C-%E5%8F%AF%E4%BB%A5%E7%BC%96%E5%86%99JNI%E7%9A%84Native%E5%BA%93%E5%90%97%EF%BC%9F/" target="_self">
+          <img src="https://img9.51tietu.net/pic/2019-091408/u2b0pq0v0ffu2b0pq0v0ff.jpg" srcset="/img/loading.gif" lazyload alt="面试题十六：只有C、C++可以编写JNI的Native库吗？">
         </a>
       </div>
     
     <article class="col-12 col-md-8 mx-auto index-info">
       <h1 class="index-header">
         
-        <a href="/2021/04/29/%E9%9D%A2%E8%AF%95%E9%A2%98%E5%8D%81%E4%BA%94%EF%BC%9A%E5%A6%82%E4%BD%95%E5%85%A8%E5%B1%80%E6%8D%95%E8%8E%B7Native%E5%BC%82%E5%B8%B8%EF%BC%9F/">面试题十五：如何全局捕获Native异常？</a>
+        <a href="/2021/04/29/%E9%9D%A2%E8%AF%95%E9%A2%98%E5%8D%81%E5%85%AD%EF%BC%9A%E5%8F%AA%E6%9C%89C%E3%80%81C-%E5%8F%AF%E4%BB%A5%E7%BC%96%E5%86%99JNI%E7%9A%84Native%E5%BA%93%E5%90%97%EF%BC%9F/">面试题十六：只有C、C++可以编写JNI的Native库吗？</a>
+      </h1>
+
+      <p class="index-excerpt">
+        <a href="/2021/04/29/%E9%9D%A2%E8%AF%95%E9%A2%98%E5%8D%81%E5%85%AD%EF%BC%9A%E5%8F%AA%E6%9C%89C%E3%80%81C-%E5%8F%AF%E4%BB%A5%E7%BC%96%E5%86%99JNI%E7%9A%84Native%E5%BA%93%E5%90%97%EF%BC%9F/">
+          
+          
+            
+          
+          只有C、C++可以编写JNI的Native库吗？
+        </a>
+      </p>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2021-04-29 14:12" pubdate>
+              2021-04-29
+            </time>
+          </div>
+        
+        
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+      <div class="col-12 col-md-4 m-auto index-img">
+        <a href="/2021/04/29/%E9%9D%A2%E8%AF%95%E9%A2%98%E5%8D%81%E4%BA%94%EF%BC%9A%E5%A6%82%E4%BD%95%E5%85%A8%E5%B1%80%E6%8D%95%E8%8E%B7Native%E5%BC%82%E5%B8%B8%EF%BC%9F/" target="_self">
+          <img src="https://img9.51tietu.net/pic/2019-091408/ndlx2laz2zkndlx2laz2zk.jpg" srcset="/img/loading.gif" lazyload alt="面试题十五：如何全局捕获Native异常？（待完善）">
+        </a>
+      </div>
+    
+    <article class="col-12 col-md-8 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2021/04/29/%E9%9D%A2%E8%AF%95%E9%A2%98%E5%8D%81%E4%BA%94%EF%BC%9A%E5%A6%82%E4%BD%95%E5%85%A8%E5%B1%80%E6%8D%95%E8%8E%B7Native%E5%BC%82%E5%B8%B8%EF%BC%9F/">面试题十五：如何全局捕获Native异常？（待完善）</a>
       </h1>
 
       <p class="index-excerpt">
@@ -197,7 +237,20 @@
           
             
           
-          如何全局捕获Native异常？
+          如何全局捕获Native异常？一、面试官视角：这道题想考察什么？
+是否熟悉Linux的信号
+是否熟悉Native层任意位置获取jclass的方法
+是否熟悉底层线程与Java虚拟机的关系
+通过实现细节的考察，确认候选人的项目经验
+
+二、题目剖析1、如何捕获Native异常？
+
+捕获Native异常
+
+
+Native异常每次都能看到signal（信号），那我们直接捕获signal就好了。
+
+12345
         </a>
       </p>
 
@@ -658,60 +711,6 @@ Java Native方法只是声明，没有实现，底层Native函数才是实现。
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
             <time datetime="2021-04-26 11:39" pubdate>
-              2021-04-26
-            </time>
-          </div>
-        
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/%E9%9D%A2%E8%AF%95/">面试</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-      <div class="col-12 col-md-4 m-auto index-img">
-        <a href="/2021/04/26/%E9%9D%A2%E8%AF%95%E9%A2%98%E5%85%AD%EF%BC%9AActivity%E7%9A%84onActivityResult%E4%BD%BF%E7%94%A8%E8%B5%B7%E6%9D%A5%E9%9D%9E%E5%B8%B8%E9%BA%BB%E7%83%A6%EF%BC%8C%E4%B8%BA%E4%BB%80%E4%B9%88%E4%B8%8D%E8%AE%BE%E8%AE%A1%E6%88%90%E5%9B%9E%E8%B0%83%EF%BC%9F/" target="_self">
-          <img src="https://img9.51tietu.net/pic/2019-091407/rv3pygphfoerv3pygphfoe.jpg" srcset="/img/loading.gif" lazyload alt="面试题六：Activity的onActivityResult使用起来非常麻烦，为什么不设计成回调？">
-        </a>
-      </div>
-    
-    <article class="col-12 col-md-8 mx-auto index-info">
-      <h1 class="index-header">
-        
-        <a href="/2021/04/26/%E9%9D%A2%E8%AF%95%E9%A2%98%E5%85%AD%EF%BC%9AActivity%E7%9A%84onActivityResult%E4%BD%BF%E7%94%A8%E8%B5%B7%E6%9D%A5%E9%9D%9E%E5%B8%B8%E9%BA%BB%E7%83%A6%EF%BC%8C%E4%B8%BA%E4%BB%80%E4%B9%88%E4%B8%8D%E8%AE%BE%E8%AE%A1%E6%88%90%E5%9B%9E%E8%B0%83%EF%BC%9F/">面试题六：Activity的onActivityResult使用起来非常麻烦，为什么不设计成回调？</a>
-      </h1>
-
-      <p class="index-excerpt">
-        <a href="/2021/04/26/%E9%9D%A2%E8%AF%95%E9%A2%98%E5%85%AD%EF%BC%9AActivity%E7%9A%84onActivityResult%E4%BD%BF%E7%94%A8%E8%B5%B7%E6%9D%A5%E9%9D%9E%E5%B8%B8%E9%BA%BB%E7%83%A6%EF%BC%8C%E4%B8%BA%E4%BB%80%E4%B9%88%E4%B8%8D%E8%AE%BE%E8%AE%A1%E6%88%90%E5%9B%9E%E8%B0%83%EF%BC%9F/">
-          
-          
-            
-          
-          Activity的onActivityResult使用起来非常麻烦，为什么不设计成回调？一、面试官视角：这道题想考察什么？
-是否熟悉onActivityResult的用法
-是否思考过用回调替代onActivityResult
-是否实践过用回调替代onActivityResult
-是否意识到回调存在的问题
-是否能给出匿名内部类对外部类引用的解决方案
-
-二、题目剖析：1、onActivityResul
-        </a>
-      </p>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2021-04-26 11:31" pubdate>
               2021-04-26
             </time>
           </div>
