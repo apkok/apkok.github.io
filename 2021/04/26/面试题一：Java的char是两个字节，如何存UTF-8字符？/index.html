@@ -185,7 +185,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      564 字
+      574 字
     </span>
   
 
@@ -235,14 +235,14 @@
 </ul>
 <h4 id="二、题目剖析："><a href="#二、题目剖析：" class="headerlink" title="二、题目剖析："></a>二、题目剖析：</h4><p>1、分别占多少字节？</p>
 <blockquote>
-<p>char可以存储两个字节，UTF-8可以存储一到三个字节</p>
+<p>char（字符数据类型）可以存储两个字节（byte），UTF-8可以存储一到三个字节</p>
 </blockquote>
 <p>2、和Unicode什么关系？</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">char</span> u8Test = <span class="hljs-string">&quot;庆&quot;</span>;<br><br>Integer.toHexString(u8Test);<br><br><span class="hljs-comment">// 打印出来是：0x5e 0x86两个字节，这两个字节就是Unicode码点，所以Unicode其实就是字符集</span><br><span class="hljs-comment">// ASCII码也是字符集，ASCII码与Unicode两者是兼容关系</span><br><span class="hljs-comment">// 字符集的作用是：完成字符到整数的映射</span><br><span class="hljs-comment">// 字符集不是编码，UTF-8是编码</span><br></code></pre></td></tr></table></figure>
 
 <p>3、如何存储字符？</p>
 <blockquote>
-<p>一个字符（如笑脸）是两个字节（0xd83d，0xde00），这两个字节其实就是字符集（Unicode、ASCII码）码点，如果通过UTF-8编码，会转换成byte类型，也就是四个字节（11110000，10011111，10011000，10000000），但在Java char里面，会通过UTF-16进行编码，转换成byte类型对应的四个字节（11011000（d8），00111101（3d），11011110（de），00000000（00）），然后通过计算器存储（比如序列化或磁盘），其实无所谓存不存的，因为在Java char里面，存储的是UTF-16的编码，跟UTF-8没有关系。</p>
+<p>一个字符（如笑脸）是两个字节（0xd83d，0xde00），这两个字节其实就是字符集（Unicode、ASCII码）码点，如果通过UTF-8编码，会转换成byte类型，也就是四个字节（11110000，10011111，10011000，10000000），但在Java char里面，会通过UTF-16进行编码，转换成byte类型对应的四个字节（11011000（d8），00111101（3d），11011110（de），00000000（00）），然后通过计算器存储（比如序列化或磁盘），其实无所谓存不存的，因为在Java char里面，存储的是UTF-16编码后的字节，跟UTF-8没有关系。</p>
 <p>Tip：UTF-8与UTF-16的区别是：UTF-8最小的单位是一个字节，UTF-16最小的单位是两个字节。</p>
 <p>（如果字符是一个A，它对应的是65，用ASCII码7个bit来表示，但在UTF-16里面也是需要两个字节的）</p>
 </blockquote>
