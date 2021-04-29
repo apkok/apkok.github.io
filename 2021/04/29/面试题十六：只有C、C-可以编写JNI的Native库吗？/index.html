@@ -185,7 +185,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      12 字
+      723 字
     </span>
   
 
@@ -195,7 +195,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      1
+      10
        分钟
     </span>
   
@@ -228,7 +228,78 @@
             <h1 style="display: none">面试题十六：只有C、C++可以编写JNI的Native库吗？</h1>
             
             <div class="markdown-body">
-              <h3 id="只有C、C-可以编写JNI的Native库吗？"><a href="#只有C、C-可以编写JNI的Native库吗？" class="headerlink" title="只有C、C++可以编写JNI的Native库吗？"></a>只有C、C++可以编写JNI的Native库吗？</h3>
+              <h3 id="只有C、C-可以编写JNI的Native库吗？"><a href="#只有C、C-可以编写JNI的Native库吗？" class="headerlink" title="只有C、C++可以编写JNI的Native库吗？"></a>只有C、C++可以编写JNI的Native库吗？</h3><h4 id="一、面试官视角：这道题想考察什么？"><a href="#一、面试官视角：这道题想考察什么？" class="headerlink" title="一、面试官视角：这道题想考察什么？"></a>一、面试官视角：这道题想考察什么？</h4><ul>
+<li>是否对JNI函数绑定的原理有深入认识</li>
+<li>是否对底层开发有丰富的经验</li>
+</ul>
+<h4 id="二、题目剖析"><a href="#二、题目剖析" class="headerlink" title="二、题目剖析"></a>二、题目剖析</h4><p>1、只有C、C++可以编写JNI的Native库吗？</p>
+<blockquote>
+<p>当然不是，关键就要看底层的Native程序它是个so库，编写出来之后它和C、C++其实没啥关系！</p>
+</blockquote>
+<p>2、Native程序与Java关联的本质是什么？</p>
+<blockquote>
+<p>关联的本质就是映射的方法，静态绑定、动态绑定等等！</p>
+<p>JNI对Native函数的要求：</p>
+<ul>
+<li>静态绑定<ul>
+<li>符号表可见</li>
+<li>命名符合Java Native方法的包名_类名_方法名</li>
+<li>符号名按照C语言的规则修饰（不能按照C++的方式来修饰，C++修饰完之后都不认识了）</li>
+</ul>
+</li>
+<li>动态绑定<ul>
+<li>函数本身无要求</li>
+<li>JNI可识别入口函数如 JNI_OnLoad进行注册即可</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<p>3、可选的Native语言</p>
+<ul>
+<li>Golang</li>
+<li>Rust</li>
+<li>Kotlin Native</li>
+<li>Scala Native</li>
+<li>…</li>
+</ul>
+<p>4、举例如何用其他语言编写符合JNI命名规则的符合</p>
+<ul>
+<li><p>认识Kotlin Native</p>
+<ul>
+<li>Kotlin-jvm<ul>
+<li>JavaFx</li>
+<li>Android</li>
+<li>Java Web</li>
+</ul>
+</li>
+<li>Kotlin-js<ul>
+<li>Front End</li>
+<li>Nodejs</li>
+</ul>
+</li>
+<li>Kotlin-native<ul>
+<li>Android Native</li>
+<li>iOS</li>
+<li>Linux Embeded（嵌入式）</li>
+<li>Wasm</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>Kotlin Native编写JNI Native库</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs kotlin">Gradle:<br><br>kotlin &#123;<br>    targets &#123;<br>        fromPreset(presets.androidNativeArm32, <span class="hljs-string">&quot;HelloWorld&quot;</span>)<br>        configure([HelloWorld]) &#123;<br>            compilations.main.outputKinds <span class="hljs-string">&#x27;DYNAMIC&#x27;</span><br>        &#125;<br>    &#125;<br>    sourceSets &#123;<br>        HelloWorldMain&#123;&#125;<br>        HelloWorldTest&#123;&#125;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs java">Java:<br><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">HelloJni</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">AppCompatActivity</span> </span>&#123;<br>    ...<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">native</span> String <span class="hljs-title">stringFromJNI</span><span class="hljs-params">()</span></span>;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">native</span> <span class="hljs-keyword">void</span> <span class="hljs-title">sayHello</span><span class="hljs-params">()</span></span>;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">native</span> String <span class="hljs-title">callJava</span><span class="hljs-params">()</span></span>;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> String <span class="hljs-title">callFromNative</span><span class="hljs-params">()</span> </span>&#123;<br>        <span class="hljs-keyword">return</span> <span class="hljs-string">&quot;This is from Java!!&quot;</span>;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs kotlin">kotlin编写的底层stringFromJNI():<br><br><span class="hljs-comment">// @CName注解，其实就是静态绑定，@CName注解的作用就是在编译的时候告诉编译器我这个函数它在符号表里面长这个样子。</span><br><span class="hljs-meta">@CName(<span class="hljs-meta-string">&quot;Java_com_example_hellojni_HelloJni_stringFromJNI&quot;</span>)</span><br><span class="hljs-comment">// 函数名是否一致不做要求</span><br><span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">stringFromJNI</span><span class="hljs-params">(env: <span class="hljs-type">CPointer</span>&lt;<span class="hljs-type">JNIEnvVar</span>&gt;, thiz: <span class="hljs-type">jobject</span>)</span></span>:jstring &#123;<br>    <span class="hljs-comment">// memScoped：在C里面内存是需要主动去释放及管理的，那么在kotlin Native里面它也是实现了自动管理，所以memScoped就是用来干这个的！</span><br>    memScoped &#123;<br>        <span class="hljs-keyword">return</span> env.pointed.pointed!!.NewStringUTF!!.invoke(env, <span class="hljs-string">&quot;This is from Kotlin Native!!&quot;</span>.cstr.ptr)!!<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs kotlin">kotlin编写的底层sayHello():<br><br><span class="hljs-meta">@CName(<span class="hljs-meta-string">&quot;Java_com_example_hellojni_HelloJni_sayHello&quot;</span>)</span><br><span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">sayHello</span><span class="hljs-params">()</span></span> &#123;<br>    _android_log_print(ANDROID_LOG_INFO.toInt(), <span class="hljs-string">&quot;Kn&quot;</span>, <span class="hljs-string">&quot;Hello %s&quot;</span>, <span class="hljs-string">&quot;Native&quot;</span>)<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs kotlin">kotlin编写的底层callJava():<br><br><span class="hljs-meta">@CName(<span class="hljs-meta-string">&quot;Java_com_example_hellojni_HelloJni_callJava&quot;</span>)</span><br><span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">callJava</span><span class="hljs-params">(env: <span class="hljs-type">CPointer</span>&lt;<span class="hljs-type">JNIEnvVar</span>&gt;, thiz: <span class="hljs-type">jobject</span>)</span></span>:jstring &#123;<br>    <span class="hljs-keyword">val</span> jniEnvVal = env.pointed.pointed!!<br>    <span class="hljs-keyword">val</span> jclass = jniEnvVal.GetObjectClass!!.invoke(env, thiz)<br>    <span class="hljs-keyword">val</span> methodId = jniEnvVal.GetMethodID!!.invoke(env, jclass, <span class="hljs-string">&quot;callFromNative&quot;</span>.cstr.ptr, <span class="hljs-string">&quot;()Ljava/lang/String;&quot;</span>.cstr.ptr)<br>    <span class="hljs-keyword">return</span> jniEnvVal.CallObjectMethodA!!.invoke(env, thiz, methodId, <span class="hljs-literal">null</span>) <span class="hljs-keyword">as</span> jstring<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs kotlin">kotlin编写的底层JNI_OnLoad:（JNI_OnLoad本身也要暴露在符号表里面的）<br><br><span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">JNI_OnLoad</span><span class="hljs-params">(vm:<span class="hljs-type">CPointer</span>&lt;<span class="hljs-type">JavaVMVar</span>&gt;, preserved:<span class="hljs-type">COpaquePointer</span>)</span></span>:jint &#123;<br>    <span class="hljs-keyword">return</span> memScoped &#123;<br>        <span class="hljs-keyword">val</span> envStorage = alloc&lt;CPointerVar&lt;JNIEnvVar&gt;&gt;()<br>        <span class="hljs-keyword">val</span> vmValue = vm.pointed.pointed!!<br>        <span class="hljs-keyword">val</span> result = vmValue.GetEnv!!(vm, envStorage.ptr.reinterpret(), JNI_VERSION_1_6)<br>        <span class="hljs-keyword">if</span>(result == JNI_OK) &#123;<br>            <span class="hljs-keyword">val</span> env = envStorage.pointed!!.pointed!!<br>            <span class="hljs-keyword">val</span> jclass = env.FindClass!!(envStorage.value, <span class="hljs-string">&quot;com/example/hellojni/HelloJni&quot;</span>.cstr.ptr)<br>            <span class="hljs-keyword">val</span> jniMethod = allocArray&lt;JNINativeMethod&gt;(<span class="hljs-number">1</span>)<br>            jniMethod[<span class="hljs-number">0</span>].fnPtr = staticCFunction(::sayHello2)<br>            jniMethod[<span class="hljs-number">0</span>].name = <span class="hljs-string">&quot;sayHello&quot;</span>.cstr.ptr<br>            jniMethod[<span class="hljs-number">0</span>].signature = <span class="hljs-string">&quot;()V&quot;</span>.cstr.ptr<br>            env.RegisterNatives!!(envStorage.value, jclass, jniMethod, <span class="hljs-number">1</span>)<br>        &#125;<br>        JNI_VERSION_1_6<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure></li>
+</ul>
+
             </div>
             <hr>
             <div>
@@ -247,6 +318,12 @@
                 <div class="post-prevnext">
                   <article class="post-prev col-6">
                     
+                    
+                      <a href="/2021/04/29/%E9%9D%A2%E8%AF%95%E9%A2%98%E5%8D%81%E4%B8%83%EF%BC%9AActivity%E7%9A%84%E5%90%AF%E5%8A%A8%E6%B5%81%E7%A8%8B%E6%98%AF%E6%80%8E%E6%A0%B7%E7%9A%84%EF%BC%9F/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">面试题十七：Activity的启动流程是怎样的？</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
                     
                   </article>
                   <article class="post-next col-6">
