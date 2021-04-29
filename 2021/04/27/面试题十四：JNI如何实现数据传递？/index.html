@@ -185,7 +185,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      1k 字
+      1.5k 字
     </span>
   
 
@@ -195,7 +195,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      11
+      17
        分钟
     </span>
   
@@ -292,7 +292,26 @@
 </ul>
 </li>
 </ul>
-<h4 id="三、题目结论"><a href="#三、题目结论" class="headerlink" title="三、题目结论"></a>三、题目结论</h4>
+<p>举例三：对象数组传递</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">useJObjectArray2</span><span class="hljs-params">(JNIEnv *env, jclass, jobjectArray objArray)</span> </span>&#123;<br>    jfieldID latFieldId = <span class="hljs-literal">NULL</span>, lngFieldId = <span class="hljs-literal">NULL</span>;<br>    jint length = env-&gt;GetArrayLength(objArray);<br>    <span class="hljs-keyword">for</span>(<span class="hljs-keyword">int</span> i = <span class="hljs-number">0</span>; i &lt; length; i++) &#123;<br>        <span class="hljs-comment">// localRef有个数限制，常见最多512个</span><br>        jobject obj = env-&gt;GetObjectArrayElement(objArray, i);<br>        <span class="hljs-keyword">if</span>(latFieldId == <span class="hljs-literal">NULL</span>) &#123;<br>            <span class="hljs-comment">//init latFieldId &amp; lngFieldId</span><br>        &#125;<br>        <br>        <span class="hljs-comment">// GetDoubleField：访问Java对象是通过使用Java反射方式来访问的</span><br>        <span class="hljs-comment">// 在设计JNI函数边界的时候，应该要尽可能的让底层接触更少的Java层的对象，比如给底层传一些基本的类型，这种代价会比较小，代价小主要体现在第一个方面拷贝的代价比较小，第二个方面就是访问的代价比较小，第三个方面就是逻辑的代价也比较小，尽可能的让底层关心效率，而不关心逻辑。</span><br>        jdouble lat = env-&gt;GetDoubleField(obj, latFieldId);<br>        jdouble lng = env-&gt;GetDoubleField(obj, lngFieldId);<br>        LOGD(<span class="hljs-string">&quot;LatLng(%f, %f)&quot;</span>, lat, lng);<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>举例四：DirectBuffer</p>
+<blockquote>
+<p>DirectBuffer是直接在物理内存上开辟了一块空间，所以对于Java虚拟机来说，可以直接读写它，对于Native层也可以直接读写它，这样的话，就不需要拷贝了，而且拷贝也是需要成本的。</p>
+<p>如下代码所示：</p>
+<p>在Jave层直接往ByteBuffer里面写了一串数值比如1 2 3 4 5 6，在Native层可以直接读，但是要注意字节序的问题。</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs java">Java虚拟机（ByteBuffer）<br><br>ByteBuffer buffer = ByteBuffer.allocateDirect(<span class="hljs-number">100</span>);<br>buffer.putInt(...);<br>buffer.flip();<br>NativeCInf.useDirectBuffer(buffer, buffer.limit());<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-keyword">int</span>* bufPtr = (<span class="hljs-keyword">int</span>*)env-&gt;GetDirectBufferAddress(buf);<br><span class="hljs-keyword">for</span>(<span class="hljs-keyword">int</span> i = <span class="hljs-number">0</span>; i&lt; length / <span class="hljs-keyword">sizeof</span>(<span class="hljs-keyword">int</span>); i++) &#123;<br>    <span class="hljs-comment">// bufPtr[i]，此处要注意字节序的问题</span><br>    LOGI(<span class="hljs-string">&quot;useArray: %d&quot;</span>, bufPtr[i]);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h4 id="三、题目结论"><a href="#三、题目结论" class="headerlink" title="三、题目结论"></a>三、题目结论</h4><ul>
+<li>通过long类型传递底层对象指针给Java层</li>
+<li>注意String的几组函数操作的区别与适用场景</li>
+<li>注意对象数组较大时localRef超过上限的问题</li>
+<li>注意使用DirectBuffer时字节序的问题</li>
+</ul>
+
             </div>
             <hr>
             <div>
@@ -318,6 +337,12 @@
                 <div class="post-prevnext">
                   <article class="post-prev col-6">
                     
+                    
+                      <a href="/2021/04/29/%E9%9D%A2%E8%AF%95%E9%A2%98%E5%8D%81%E4%BA%94%EF%BC%9A%E5%A6%82%E4%BD%95%E5%85%A8%E5%B1%80%E6%8D%95%E8%8E%B7Native%E5%BC%82%E5%B8%B8%EF%BC%9F/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">面试题十五：如何全局捕获Native异常？</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
                     
                   </article>
                   <article class="post-next col-6">
