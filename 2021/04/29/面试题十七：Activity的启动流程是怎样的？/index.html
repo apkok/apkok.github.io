@@ -185,7 +185,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      1.3k 字
+      1.8k 字
     </span>
   
 
@@ -195,7 +195,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      14
+      20
        分钟
     </span>
   
@@ -252,11 +252,14 @@
 <p>3、Activity的参数和结果如何传递</p>
 <blockquote>
 <p>启动Activity的时候，有跨进程的调用，那么跨进程的调用是通过Binder来实现通信的，Binder本身有一个缓冲区，但这个缓冲区有大小的限制，如果你启动Activity的时候，携带数据过大的话会有问题的，而且数据必须可以序列化。</p>
+<p>数据过大的话，如何传递呢？</p>
+<p>如果能确保Activity在同一进程当中，使用Model进行数据共享，首先在Activity A将数据设置到Model中，然后从Activity A传递一个key到Activity B就可以了，然后在Activity B中通过key去Model里面读取数据即可，这样的话，也可以实现数据与页面的解耦。</p>
+<p>如果Activity跨进程的话，就需要实现可进程间通信，这个Model可以是一个进程间可以访问的，比如使用ContentProvider来访问。</p>
 </blockquote>
 <p>4、Activity如何实例化</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs java">Instrumentation.java:<br><br><span class="hljs-function"><span class="hljs-keyword">public</span> Activity <span class="hljs-title">newActivity</span><span class="hljs-params">(ClassLoader cl, String className, Intent intent)</span> <span class="hljs-keyword">throws</span> InstantiationException, IllegalAccessException, ClassNotFoundException </span>&#123;<br>    String pkg = intent != <span class="hljs-keyword">null</span> &amp;&amp; intent.getComponent() != <span class="hljs-keyword">null</span>?intent.getComponent().getPackageName():<span class="hljs-keyword">null</span>;<br>    <span class="hljs-comment">// 实例化Activity</span><br>    <span class="hljs-keyword">return</span> getFactory(pkg).instantiateActivity(cl, className, intent);<br>&#125;<br></code></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs java">Instrumentation.java源码:<br><br><span class="hljs-function"><span class="hljs-keyword">public</span> Activity <span class="hljs-title">newActivity</span><span class="hljs-params">(ClassLoader cl, String className, Intent intent)</span> <span class="hljs-keyword">throws</span> InstantiationException, IllegalAccessException, ClassNotFoundException </span>&#123;<br>    String pkg = intent != <span class="hljs-keyword">null</span> &amp;&amp; intent.getComponent() != <span class="hljs-keyword">null</span>?intent.getComponent().getPackageName():<span class="hljs-keyword">null</span>;<br>    <span class="hljs-comment">// 实例化Activity</span><br>    <span class="hljs-keyword">return</span> getFactory(pkg).instantiateActivity(cl, className, intent);<br>&#125;<br></code></pre></td></tr></table></figure>
 
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs java">instantiate()实现:<br><br><span class="hljs-keyword">public</span> <span class="hljs-meta">@NonNull</span> <span class="hljs-function">Activity <span class="hljs-title">instantiateActivity</span><span class="hljs-params">(<span class="hljs-meta">@NonNull</span> ClassLoader cl, <span class="hljs-meta">@NonNull</span> String className, <span class="hljs-meta">@Nullable</span> Intent intent)</span> <span class="hljs-keyword">throws</span> InstantiationException, IllegalAccessException, ClassNotFoundException </span>&#123;<br>    <span class="hljs-comment">// 反射</span><br>    <span class="hljs-comment">// newInstance能够调用的话，必须要有一个默认的无参的构造方法，这就是为什么我们写Activity的时候，从来没有写过构造方法的原因，如果你写了，Activity压根就无法实例化，同时Idea也会提示你不能这么写，因为这样会导致Activity无法启动。</span><br>    <span class="hljs-keyword">return</span> (Activity)cl.loadClass(className).newInstance();<br>&#125;<br></code></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs java">instantiate()源码实现:<br><br><span class="hljs-keyword">public</span> <span class="hljs-meta">@NonNull</span> <span class="hljs-function">Activity <span class="hljs-title">instantiateActivity</span><span class="hljs-params">(<span class="hljs-meta">@NonNull</span> ClassLoader cl, <span class="hljs-meta">@NonNull</span> String className, <span class="hljs-meta">@Nullable</span> Intent intent)</span> <span class="hljs-keyword">throws</span> InstantiationException, IllegalAccessException, ClassNotFoundException </span>&#123;<br>    <span class="hljs-comment">// 反射</span><br>    <span class="hljs-comment">// newInstance能够调用的话，必须要有一个默认的无参的构造方法，这就是为什么我们写Activity的时候，从来没有写过构造方法的原因，如果你写了，Activity压根就无法实例化，同时Idea也会提示你不能这么写，因为这样会导致Activity无法启动。</span><br>    <span class="hljs-keyword">return</span> (Activity)cl.loadClass(className).newInstance();<br>&#125;<br></code></pre></td></tr></table></figure>
 
 <p>5、Activity、Fragment为什么不能添加有参数的构造方法？</p>
 <blockquote>
@@ -309,8 +312,14 @@
 </li>
 </ul>
 <p>7、Activity转场动画的实现机制</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs java">ExitTransitionCoordinator:<br><br><span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">void</span> <span class="hljs-title">startExitTransition</span><span class="hljs-params">()</span> </span>&#123;<br>    Transition transition = getExitTransition();<br>    ViewGroup docorView = getDecor();<br>    <br>&#125;<br></code></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><code class="hljs java">ExitTransitionCoordinator.java源码:<br><br><span class="hljs-comment">// Android 5.0的新特性</span><br><span class="hljs-comment">// 原理：在播放动画之前或实现页面跳转之前，先把你需要实现转场的这些元素拿到，然后把它的位置给记录下来，比如捕捉它的位置信息、大小信息等等，然后跳转到新的页面，在新的页面显示之前，再把刚才捕捉到的页面共享元素位置、大小信息拿到，把它应用到我的新页面这些共享元素的属性当中，再让它从当前的共享元素的值开始，播放到目标元素，也就是新页面当中这些被共享的元素它应该所在的位置。</span><br><span class="hljs-comment">// 这种特性可以直接在View上面使用，也可以在Frgment中使用，Fragment也有sharedElements这样的参数，可以去设置。</span><br><span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">void</span> <span class="hljs-title">startExitTransition</span><span class="hljs-params">()</span> </span>&#123;<br>    Transition transition = getExitTransition();<br>    ViewGroup docorView = getDecor();<br>    <span class="hljs-keyword">if</span>(<span class="hljs-comment">/*no null*/</span>) &#123;<br>        setTransitioningViewsVisiblity(View.VISIBLE,<span class="hljs-keyword">false</span>);<br>        TransitionManager.beginDelayedTransition(decorView, transition);<br>        setTransitioningViewVisiblity(View.INVISIBLE, <span class="hljs-keyword">false</span>);<br>        decorView.invalidate();<br>    &#125;<span class="hljs-keyword">else</span> &#123;<br>        transitionStarted();<br>    &#125;<br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">void</span> <span class="hljs-title">startSharedElementTransition</span><span class="hljs-params">(Bundle sharedElementState)</span> </span>&#123;<br>    ...<br>    ArrayList&lt;View&gt; sharedElementSnapshots = createSnapshots(sharedElementState, mSharedElementNames);<br>    ...<br>        <br>    Transition transition = beginTransition(decorView, ...);<br>    <span class="hljs-keyword">if</span>(startEnterTransition) &#123;<br>        startEnterTransition(transition);<br>    &#125;<br>    ...<br>&#125;<br></code></pre></td></tr></table></figure>
 
+<h4 id="三、题目结论"><a href="#三、题目结论" class="headerlink" title="三、题目结论"></a>三、题目结论</h4><ul>
+<li>Activity启动流程是一个庞大的题目，足够灵活</li>
+<li>启动过程中涉及到AMS的交互与插件化紧密相关</li>
+<li>参数传递机制的可与架构设计联系进行迁移</li>
+<li>生命周期与窗口展示可以向事件处理、UI绘制等话题迁移</li>
+</ul>
 
             </div>
             <hr>
@@ -330,6 +339,12 @@
                 <div class="post-prevnext">
                   <article class="post-prev col-6">
                     
+                    
+                      <a href="/2021/04/30/%E9%9D%A2%E8%AF%95%E9%A2%98%E5%8D%81%E5%85%AB%EF%BC%9A%E5%A6%82%E4%BD%95%E8%B7%A8App%E5%90%AF%E5%8A%A8Activity%EF%BC%9F%E6%9C%89%E5%93%AA%E4%BA%9B%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9%EF%BC%9F/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">面试题十八：如何跨App启动Activity？有哪些注意事项？</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
                     
                   </article>
                   <article class="post-next col-6">
