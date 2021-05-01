@@ -185,7 +185,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      13 字
+      957 字
     </span>
   
 
@@ -195,7 +195,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      1
+      12
        分钟
     </span>
   
@@ -228,7 +228,78 @@
             <h1 style="display: none">面试题十八：如何跨App启动Activity？有哪些注意事项？</h1>
             
             <div class="markdown-body">
-              <h3 id="如何跨App启动Activity？有哪些注意事项？"><a href="#如何跨App启动Activity？有哪些注意事项？" class="headerlink" title="如何跨App启动Activity？有哪些注意事项？"></a>如何跨App启动Activity？有哪些注意事项？</h3>
+              <h3 id="如何跨App启动Activity？有哪些注意事项？"><a href="#如何跨App启动Activity？有哪些注意事项？" class="headerlink" title="如何跨App启动Activity？有哪些注意事项？"></a>如何跨App启动Activity？有哪些注意事项？</h3><h4 id="一、面试官视角：这道题想考察什么？"><a href="#一、面试官视角：这道题想考察什么？" class="headerlink" title="一、面试官视角：这道题想考察什么？"></a>一、面试官视角：这道题想考察什么？</h4><ul>
+<li>是否了解如何启动外部应用的Activity</li>
+<li>是否了解如何防止自己的Activity被外部非正当启动</li>
+<li>是否对拒绝服务漏洞有了解</li>
+<li>如何在开发时规避拒绝服务漏洞</li>
+</ul>
+<h4 id="二、题目剖析"><a href="#二、题目剖析" class="headerlink" title="二、题目剖析"></a>二、题目剖析</h4><p>1、如何启动外部应用的Activity</p>
+<ul>
+<li>共享uid的App</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs java">&lt;manifest xmlns:android=<span class="hljs-string">&quot;http://schemas.android.com/apk/res/android&quot;</span><br>    <span class="hljs-keyword">package</span>=<span class="hljs-string">&quot;com.apkok.android&quot;</span><br>    android:sharedUserId=<span class="hljs-string">&quot;com.apkok&quot;</span><br>    ...<br>&lt;/manifest&gt;<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs kotlin"><span class="hljs-comment">// kotlin中使用</span><br><br>startActivity(Intent().setComponent(ComponentName(<span class="hljs-string">&quot;com.apkok.app.b&quot;</span>,<span class="hljs-string">&quot;com.apkok.app.b.BActivity&quot;</span>)))<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>使用exported</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs java">AndroidManifest.xml清单文件中：<br><span class="hljs-comment">// 当exported为true的时候，这种方式是将该Activity暴露在了系统当中，随便哪个应用都可以直接访问该Activity。</span><br>&lt;activity android:name=<span class="hljs-string">&quot;.BActivity&quot;</span> android:exported=<span class="hljs-string">&quot;true&quot;</span>/&gt;<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">// kotlin中使用</span><br><br>startActivity(Intent().setComponent(ComponentName(<span class="hljs-string">&quot;com.apkok.app.b&quot;</span>,<span class="hljs-string">&quot;com.apkok.app.b.BActivity&quot;</span>)))<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>使用intentFilter（隐式启动）</li>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs java">&lt;activity android:name=<span class="hljs-string">&quot;.BActivity&quot;</span>&gt;<br>    &lt;intent-filter&gt;<br>    	&lt;action android:name=<span class="hljs-string">&quot;com.apkok.intent.TEST&quot;</span>/&gt;<br>        &lt;category android:name=<span class="hljs-string">&quot;android.intent.category.DEFAULT&quot;</span>/&gt;<br>    &lt;/intent-filter&gt;<br>&lt;/activity&gt;<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs kotlin"><span class="hljs-comment">// kotlin中使用</span><br><br>startActivity(Intent(<span class="hljs-string">&quot;com.apkok.intent.TEST&quot;</span>));<br></code></pre></td></tr></table></figure>
+
+<p>2、为允许外部启动的Activity加权限</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs java">App B中的Activity B:<br><br>&lt;permission android:name=<span class="hljs-string">&quot;com.apkok.b&quot;</span>/&gt;<br>    <br>&lt;activity android:name=<span class="hljs-string">&quot;.BActivity&quot;</span><br>    android:permission=<span class="hljs-string">&quot;com.apkok.b&quot;</span>&gt;<br>    &lt;intent-filter&gt;<br>        &lt;action android:name=<span class="hljs-string">&quot;com.apkok.intent.TEST&quot;</span>/&gt;<br>        &lt;category android:name=<span class="hljs-string">&quot;android.intent.category.DEFAULT&quot;</span>/&gt;<br>    &lt;/intent-filter&gt;<br>&lt;/activity&gt;<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs kotlin">App A中的Activity A:<br><br>&lt;uses-permission android:name=<span class="hljs-string">&quot;com.apkok.b&quot;</span>/&gt;<br><br><span class="hljs-comment">// kotlin中使用</span><br>startActivity(Intent(<span class="hljs-string">&quot;com.apkok.intent.TEST&quot;</span>));<br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<p>注意：如果通过权限的方式在App A中的Activity A来启动App B中的Activity B，需要确保App B要比App A先安装，这样的话，在App A中才可以获取到权限，反之亦然。</p>
+</blockquote>
+<p>3、拒绝服务漏洞</p>
+<blockquote>
+<p>场景：App A中的Activity A要启动App B中的Activity B，这样的话，Activity A就是攻击者，Activity B是受害者，在Activity B把自己暴露出来了之后，会出现什么情况呢？</p>
+<p>假设Activity A启动Activity B的时候，传递参数的时候，往Bundle里面扔了一个SerializableA，但SerializableA这个类只在App A里面有，App B里面没有，但我们都知道Bundle在收到数据之后，只要你在Activity B里面去访问了Intent的Extras，它就一定会把里面的数据进行反序列化出来，那么在反序列化的过程当中，如果有一个它不知道的类，那就会抛出一个找不到类的异常，这就是我们通常所说的拒绝服务漏洞。</p>
+</blockquote>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs kotlin"><span class="hljs-comment">// kotlin代码</span><br><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">SerializableA</span>: <span class="hljs-type">Serializable</span></span><br><br>startActivity(Intent(<span class="hljs-string">&quot;com.apkok.intent.TEST.B&quot;</span>).putExtra(<span class="hljs-string">&quot;SerializableA&quot;</span>, SerializableA()))<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">// WXEntryActivity.java</span><br><br><span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">void</span> <span class="hljs-title">handleIntent</span><span class="hljs-params">(Intent intent)</span> </span>&#123;<br>    SendAuth.Resp resp = <span class="hljs-keyword">new</span> SendAuth.Resp(intent.getExtras());<br>    ...<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<p>以上代码场景是：App A中的Activity A启动微信App进行微信登录授权或使用微信的一些服务的时候，微信会要求我们集成WXEntryActivity类，这个类里面有个handleIntent()方法，方法里面会调用intent.getExtras()方法，这个时候就会将我们传递过来的SerializableA进行反序列化，但在反序列化的过程中，因为微信App里没有SerializableA类，那么就会抛出一个找不到类的异常。</p>
+<p>这种问题如何解决呢？</p>
+<ul>
+<li>Activity中读取Intent的Extras的时候，使用try、catch捕获异常</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs java">修改WXEntryActivity.java代码：<br>    <br><span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">void</span> <span class="hljs-title">handleIntent</span><span class="hljs-params">(Intent intent)</span> </span>&#123;<br>    <span class="hljs-keyword">try</span> &#123;<br>        SendAuth.Resp resp = <span class="hljs-keyword">new</span> SendAuth.Resp(intent.getExtras());<br>        ...<br>    &#125;<span class="hljs-keyword">catch</span>(Exception e) &#123;<br>        e.printStackTrace();<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+</blockquote>
+<h4 id="题目结论"><a href="#题目结论" class="headerlink" title="题目结论"></a>题目结论</h4><ul>
+<li><p>跨App启动Activity首先要明确App之间的关系</p>
+<blockquote>
+<p>比如是否sharedUserId</p>
+</blockquote>
+</li>
+<li><p>外部可启动exported或有intentFilter的Activity</p>
+<blockquote>
+<p>exported不推荐使用</p>
+</blockquote>
+</li>
+<li><p>可外部启动的Activity，需要注意拒绝服务漏洞</p>
+</li>
+<li><p>尽量不暴露Activity，为暴露的Activity加权限控制</p>
+</li>
+<li><p>Intent的Extras读取时要注意捕获异常</p>
+</li>
+</ul>
+
             </div>
             <hr>
             <div>
@@ -247,6 +318,12 @@
                 <div class="post-prevnext">
                   <article class="post-prev col-6">
                     
+                    
+                      <a href="/2021/05/01/%E9%9D%A2%E8%AF%95%E9%A2%98%E5%8D%81%E4%B9%9D%EF%BC%9A%E5%A6%82%E4%BD%95%E8%A7%A3%E5%86%B3Activity%E5%8F%82%E6%95%B0%E7%9A%84%E7%B1%BB%E5%9E%8B%E5%AE%89%E5%85%A8%E5%8F%8A%E6%8E%A5%E5%8F%A3%E7%B9%81%E7%90%90%E7%9A%84%E9%97%AE%E9%A2%98%EF%BC%9F/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">面试题十九：如何解决Activity参数的类型安全及接口繁琐的问题？</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
                     
                   </article>
                   <article class="post-next col-6">
